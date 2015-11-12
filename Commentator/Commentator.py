@@ -34,13 +34,10 @@ class Commentator(Thread):
 			event = self.eventQueue.get(True);
 
 			if (isinstance(event, Messages.InitMessage)):
-				print "asdfasdflsakjfdlkjsadjfsa";
-				for i in range(9):
+				for i in range(10):
 					player = self.players[i];
 					player.name = event.summonerNames[i];
 					player.champion = event.championNames[i];
-					print player.name;
-					print player.champion;
 			elif (isinstance(event, Messages.PropertyChangeMessage)):
 				if (event.propertyName in self.playerProperties):
 					player = self.players[event.sourceId];

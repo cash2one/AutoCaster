@@ -10,7 +10,7 @@ class EventParser(Thread):
 
 		self.eventPattern = re.compile("^\((\w+)\)(.*)$");
 		self.propertySourcePattern = re.compile("(\w+)_(\d+)");
-		self.initPattern = re.compile("([A-Za-z0-9]+),([A-Za-z0-9]+),img");
+		self.initPattern = re.compile("([^,:]+),([^,:]+),img");
 
 	def run(self):
 		print "Generating event";
