@@ -1,0 +1,259 @@
+{
+  "Voices": [
+    {
+      "Gender": "Female",
+      "Name": "Salli",
+      "Language": "en-US"
+    },
+    {
+      "Gender": "Male",
+      "Name": "Joey",
+      "Language": "en-US"
+    },
+    {
+      "Gender": "Female",
+      "Name": "Naja",
+      "Language": "da-DK"
+    },
+    {
+      "Gender": "Male",
+      "Name": "Mads",
+      "Language": "da-DK"
+    },
+    {
+      "Gender": "Female",
+      "Name": "Marlene",
+      "Language": "de-DE"
+    },
+    {
+      "Gender": "Male",
+      "Name": "Hans",
+      "Language": "de-DE"
+    },
+    {
+      "Gender": "Female",
+      "Name": "Nicole",
+      "Language": "en-A"
+    },
+    {
+      "Gender": "Male",
+      "Name": "Russell",
+      "Language": "en-A"
+    },
+    {
+      "Gender": "Female",
+      "Name": "Amy",
+      "Language": "en-GB"
+    },
+    {
+      "Gender": "Male",
+      "Name": "Brian",
+      "Language": "en-GB"
+    },
+    {
+      "Gender": "Female",
+      "Name": "Emma",
+      "Language": "en-GB"
+    },
+    {
+      "Gender": "Female",
+      "Name": "Gwyneth",
+      "Language": "en-GB-WLS"
+    },
+    {
+      "Gender": "Male",
+      "Name": "Geraint",
+      "Language": "en-GB-WLS"
+    },
+    {
+      "Gender": "Female",
+      "Name": "Gwyneth",
+      "Language": "cy-GB"
+    },
+    {
+      "Gender": "Male",
+      "Name": "Geraint",
+      "Language": "cy-GB"
+    },
+    {
+      "Gender": "Female",
+      "Name": "Raveena",
+      "Language": "en-IN"
+    },
+    {
+      "Gender": "Male",
+      "Name": "Chipmunk",
+      "Language": "en-US"
+    },
+    {
+      "Gender": "Male",
+      "Name": "Eric",
+      "Language": "en-US"
+    },
+    {
+      "Gender": "Female",
+      "Name": "Ivy",
+      "Language": "en-US"
+    },
+    {
+      "Gender": "Female",
+      "Name": "Jennifer",
+      "Language": "en-US"
+    },
+    {
+      "Gender": "Male",
+      "Name": "Justin",
+      "Language": "en-US"
+    },
+    {
+      "Gender": "Female",
+      "Name": "Kendra",
+      "Language": "en-US"
+    },
+    {
+      "Gender": "Female",
+      "Name": "Kimberly",
+      "Language": "en-US"
+    },
+    {
+      "Gender": "Female",
+      "Name": "Conchita",
+      "Language": "es-ES"
+    },
+    {
+      "Gender": "Male",
+      "Name": "Enrique",
+      "Language": "es-ES"
+    },
+    {
+      "Gender": "Female",
+      "Name": "Penelope",
+      "Language": "es-US"
+    },
+    {
+      "Gender": "Male",
+      "Name": "Miguel",
+      "Language": "es-US"
+    },
+    {
+      "Gender": "Female",
+      "Name": "Chantal",
+      "Language": "fr-CA"
+    },
+    {
+      "Gender": "Female",
+      "Name": "Celine",
+      "Language": "fr-FR"
+    },
+    {
+      "Gender": "Male",
+      "Name": "Mathie",
+      "Language": "fr-FR"
+    },
+    {
+      "Gender": "Female",
+      "Name": "Dora",
+      "Language": "is-IS"
+    },
+    {
+      "Gender": "Male",
+      "Name": "Karl",
+      "Language": "is-IS"
+    },
+    {
+      "Gender": "Female",
+      "Name": "Carla",
+      "Language": "it-IT"
+    },
+    {
+      "Gender": "Male",
+      "Name": "Giorgio",
+      "Language": "it-IT"
+    },
+    {
+      "Gender": "Female",
+      "Name": "Liv",
+      "Language": "nb-NO"
+    },
+    {
+      "Gender": "Female",
+      "Name": "Lotte",
+      "Language": "nl-NL"
+    },
+    {
+      "Gender": "Male",
+      "Name": "Ruben",
+      "Language": "nl-NL"
+    },
+    {
+      "Gender": "Female",
+      "Name": "Agnieszka",
+      "Language": "pl-PL"
+    },
+    {
+      "Gender": "Male",
+      "Name": "Jacek",
+      "Language": "pl-PL"
+    },
+    {
+      "Gender": "Female",
+      "Name": "Ewa",
+      "Language": "pl-PL"
+    },
+    {
+      "Gender": "Male",
+      "Name": "Jan",
+      "Language": "pl-PL"
+    },
+    {
+      "Gender": "Female",
+      "Name": "Maja",
+      "Language": "pl-PL"
+    },
+    {
+      "Gender": "Female",
+      "Name": "Vitoria",
+      "Language": "pt-BR"
+    },
+    {
+      "Gender": "Male",
+      "Name": "Ricardo",
+      "Language": "pt-BR"
+    },
+    {
+      "Gender": "Male",
+      "Name": "Cristiano",
+      "Language": "pt-PT"
+    },
+    {
+      "Gender": "Female",
+      "Name": "Ines",
+      "Language": "pt-PT"
+    },
+    {
+      "Gender": "Female",
+      "Name": "Carmen",
+      "Language": "ro-RO"
+    },
+    {
+      "Gender": "Male",
+      "Name": "Maxim",
+      "Language": "ru-R"
+    },
+    {
+      "Gender": "Female",
+      "Name": "Tatyana",
+      "Language": "ru-R"
+    },
+    {
+      "Gender": "Female",
+      "Name": "Astrid",
+      "Language": "sv-SE"
+    },
+    {
+      "Gender": "Female",
+      "Name": "Filiz",
+      "Language": "tr-TR"
+    }
+  ]
+}
