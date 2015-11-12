@@ -1,5 +1,5 @@
 from threading import Thread;
-from EventMessage import EventMessage;
+import Messages;
 import time;
 
 class EventParser(Thread):
@@ -9,4 +9,4 @@ class EventParser(Thread):
 
 	def run(self):
 		print "Generating event";
-		self.eventQueue.put(EventMessage("HP", 0, 100));
+		self.eventQueue.put(Messages.PropertyChangeMessage("HP", 0, 100));
