@@ -42,7 +42,7 @@ class EventParser(Thread):
 							if (propertyMatch):
 								propertyGroups = propertyMatch.groups();
 								propertyName = propertyGroups[0];
-								propertySource = propertyGroups[1];
+								propertySource = int(propertyGroups[1]);
 
 							self.eventQueue.put(Messages.PropertyChangeMessage(eventSource, propertyName, propertySource, propertyValue));
 					else:

@@ -18,6 +18,7 @@ class Player(object):
         self.spellLevels = []
         self.spellCDs = []
         self.kills = 0
+        self.killCount = 0
         self.deaths = 0
         self.assists = 0
         self.attackSpeed = 0
@@ -28,3 +29,9 @@ class Player(object):
         self.level = 1
         self.exp = 0
         self.gold = 0
+
+    def update(self, propertyChangedEvent):
+        if (propertyChangedEvent.propertyName == "Kills"):
+            self.kills = propertyChangedEvent.value;
+        elif (propertyChangedEvent.propertyName == "KillCount"):
+            self.killCount = propertyChangedEvent.value;

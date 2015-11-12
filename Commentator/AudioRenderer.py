@@ -1,4 +1,5 @@
 from threading import Thread
+import Messages
 import time
 import pyvona
 import hashlib
@@ -22,13 +23,13 @@ class AudioRenderer(Thread):
     def run(self):
         while True:
             event = self.commentatorQueue.get(True)
-            print "Audio renderer recieved commentation."
-            self.rendererQueue.put(event)
-
+            #print "Audio renderer recieved commentation."
             '''
                 replace speech and rate with event.speech and event.rate
             '''
-            speech = "Katarina got a penta kill"
+            speech = event.text
+            print speech;
+
             rate = "medium"
             sha256 = hashlib.sha256(speech + rate)
             hash_string = sha256.hexdigest()
@@ -38,11 +39,12 @@ class AudioRenderer(Thread):
                 self.v.speech_rate = rate
                 self.v.voice_name = "Salli"
                 self.v.fetch_voice(speech, output_file)
-            else:
-                print "already exists"
+            #else:
+                #print "already exists"
 
             '''
                 put this into next queue
             '''
 
-            print output_file
+            #print output_file
+            self.rendererQueue.put(event)
