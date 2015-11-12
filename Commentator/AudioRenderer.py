@@ -15,7 +15,7 @@ class AudioRenderer(Thread):
                 "GDNAJCIHKDP2YAKG664A",
                 "8yaFb9+jGeuI8DDrYKdK+9jUVNAqqYRuxyG254la"
             )
-        self.v.codec = "mp3"
+        self.v.codec = "ogg"
         self.v.region = "us-west"
         self.commentatorQueue = commentatorQueue
         self.rendererQueue = rendererQueue
@@ -23,18 +23,16 @@ class AudioRenderer(Thread):
     def run(self):
         while True:
             event = self.commentatorQueue.get(True)
-            #print "Audio renderer recieved commentation."
-            '''
-                replace speech and rate with event.speech and event.rate
-            '''
+            # print "Audio renderer recieved commentation."
+
             speech = event.text
-            print speech;
+            print speech
 
             rate = "medium"
             sha256 = hashlib.sha256(speech + rate)
             hash_string = sha256.hexdigest()
 
-            output_file = AUDIO_DIRECTORY + hash_string + ".mp3"
+            output_file = AUDIO_DIRECTORY + hash_string + ".ogg"
             if not os.path.isfile(output_file):
                 self.v.speech_rate = rate
                 self.v.voice_name = "Salli"
@@ -42,9 +40,8 @@ class AudioRenderer(Thread):
             #else:
                 #print "already exists"
 
-            '''
-                put this into next queue
-            '''
+            message = {}
+            message["audio_file"] = output_file
+            message["source"] = 0
 
-            #print output_file
-            self.rendererQueue.put(event)
+            self.rendererQueue.put(message)
