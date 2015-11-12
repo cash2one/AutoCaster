@@ -9,4 +9,4 @@ class AudioPlayer(Thread):
 	def run(self):
 		while True:
 			event = self.rendererQueue.get(True);
-			print "Audio player an audio to play. " + str(event);
+			#print "Audio player an audio to play. " + str(event);

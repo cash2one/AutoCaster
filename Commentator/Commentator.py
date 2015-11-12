@@ -1,4 +1,5 @@
 from threading import Thread;
+import Messages;
 import Game;
 import json;
 import time;
@@ -30,6 +31,11 @@ class Commentator(Thread):
 
 		while True:
 			event = self.eventQueue.get(True);
+
+			if (isinstance(event, Messages.PropertyChangeMessage)):
+				if ("kill" in event.propertyName.lower()):
+					print "Property: {p}, Source: {s}, Value: {v}".format(p=event.propertyName, s=event.sourceId, v=event.value);
+
 			self.processEvent(event);
 
 	def processEvent(self, event):

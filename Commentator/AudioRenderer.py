@@ -11,5 +11,5 @@ class AudioRenderer(Thread):
 	def run(self):
 		while True:
 			event = self.commentatorQueue.get(True);
-			print "Audio renderer recieved commentation."
+			# print "Audio renderer recieved commentation. >> " +  str(self.commentatorQueue.qsize())
 			self.rendererQueue.put(event);
