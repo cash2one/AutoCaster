@@ -1,4 +1,5 @@
 from threading import Thread;
+import Game;
 import json;
 import time;
 
@@ -9,6 +10,16 @@ class Commentator(Thread):
 		self.eventQueue = eventQueue;
 		self.commentatorQueue = commentatorQueue;
 
+		self.teams = [];
+
+		for i in range(2):
+			self.teams.append(Game.Team(i));
+
+		self.players = [];
+
+		for i in range(10):
+			self.players.append(Game.Player(i));
+
 		with open("Config.json") as configFile:
 			config = json.load(configFile)
 	
@@ -16,7 +27,11 @@ class Commentator(Thread):
 
 	def run(self):
 		print "Commentator started";
+
 		while True:
 			event = self.eventQueue.get(True);
-			print "Commentator recieved event."
-			self.commentatorQueue.put(1);
+			self.processEvent(event);
+
+	def processEvent(self, event):
+		self.commentatorQueue.put(event);
+		pass

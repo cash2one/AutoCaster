@@ -12,4 +12,4 @@ class AudioRenderer(Thread):
 		while True:
 			event = self.commentatorQueue.get(True);
 			print "Audio renderer recieved commentation."
-			self.rendererQueue.put(1);
+			self.rendererQueue.put(event);
