@@ -11,7 +11,7 @@ var ivona = new Ivona({
 	secretKey: '8yaFb9+jGeuI8DDrYKdK+9jUVNAqqYRuxyG254la'
 });
 
-    ivona.createVoice('This is the text that will be spoken.', {
+    ivona.createVoice('Kassuhdin got a penta kill.', {
         body: {
             voice: {
                 name: 'Salli',
