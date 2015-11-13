@@ -2,6 +2,11 @@ from threading import Thread;
 import Messages;
 import time;
 import re;
+import socket;
+
+ip = "192.168.203.180";
+port = 8444;
+
 
 class EventParser(Thread):
 	def __init__(self, eventQueue):
@@ -13,13 +18,24 @@ class EventParser(Thread):
 		self.initPattern = re.compile("([^,:]+),([^,:]+),img...__(........),img");
 		self.killPattern = re.compile("1,img...__(........),([-\d]+),([-\d]+),img...__(........),([-\d]+),([-\d]+),img...__(........),([-\d]+)(?:,img...__(........))*")
 
-#1,img://__09f5e000,1,0,img://__09ce8400,0,6,img://__09a67900,-1,img://__09d4af00,img://__09e53f00
 	def run(self):
 		print "Generating event";
 
-		f = open('game.txt', 'r');
-		ln = 0
-		for line in f:
+		#f = open('game.txt', 'r');
+		#ln = 0
+		#for line in f:
+		try:
+			s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		except socket.error as err:
+			print "Socket creation failed."
+
+		s.bind((ip, port));
+		s.listen(2)
+		ln=0
+		(client, address) = s.accept()
+		while True:
+			line = read_line(client)
+			print(line)
 			match = self.eventPattern.match(line);
 
 			ln = ln + 1
@@ -52,6 +68,7 @@ class EventParser(Thread):
 						self.eventQueue.put(self.parseInit(data));
 					elif (eventSource == "AddMessage"):
 						self.eventQueue.put(self.parseKillMessage(data));
+
 
 	def parseInit(self, rawData):
 		groups = self.initPattern.findall(rawData);
@@ -86,3 +103,15 @@ class EventParser(Thread):
 		assistIds = 0;
 
 		return Messages.KillMessage(victimId, killerId, assistIds);
+
+def read_line(s):
+	ret = ''
+
+	while True:
+		c = s.recv(1)
+
+		if c == '\n' or c == '':
+		    break
+		else:
+		    ret += c
+	return ret
