@@ -124,6 +124,5 @@ class Commentator(Thread):
 				return player;
 
 	def processMessage(self, actor, message, rate="medium", volume=0.8, pitch=1.0):
-		if random.randint(0, 10) < 3:
-			self.commentatorQueue.put(actor.generateMessage(message, rate, volume, pitch))
+		self.commentatorQueue.put(actor.generateMessage(message, rate, volume, pitch))
 
