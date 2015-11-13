@@ -142,7 +142,7 @@ class EventParser(Thread):
         while True:
             try:
                 data = s.recv(1024);
-            except Error as e:
+            except:
                 break;
 
             if not data:
