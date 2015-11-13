@@ -16,7 +16,7 @@ class Commentator(Thread):
 		for i in range(2):
 			self.teams.append(Game.Team(i));
 
-		self.playerProperties = ["Kills", "KillCount"];
+		self.playerProperties = ["Kills", "KillCount", "Heath", "Level"];
 		self.players = [];
 
 		for i in range(10):

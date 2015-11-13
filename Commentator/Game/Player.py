@@ -36,3 +36,7 @@ class Player(object):
             self.kills = propertyChangedEvent.value;
         elif (propertyChangedEvent.propertyName == "KillCount"):
             self.killCount = propertyChangedEvent.value;
+        elif (propertyChangedEvent.propertyName == "Heatlh"):
+            self.health = propertyChangedEvent.value;
+        elif (propertyChangedEvent.propertyName == "Level"):
+            self.level = propertyChangedEvent.value;
