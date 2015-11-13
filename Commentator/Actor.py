@@ -69,6 +69,21 @@ class Actor(object):
             playerLevel = messageArgs["player"].level;
             if (playerLevel == 6 or playerLevel == 11 or playerLevel == 16):
                 return "{player.champion} just reached level {player.level}. The {enemyTeam.name} better watch out for that.";
+        elif (messageType == CommentaryType.GameState):
+            winningTeam = messageArgs["winningTeam"]
+            losingTeam = messageArgs["losingTeam"]
+            spread = messageArgs["spread"]
+
+            if (spread == 0):
+                return "The game is currently dead even {minutes} minutes into this game.";
+            if (spread < 500):
+                return "It's {minutes} minutes in and the game is close with just a {spread} gold lead in {winningTeam.name}'s favor.";
+            elif (spread < 2000):
+                return "{winningTeam.name}'s lead stands at {spread}, {minutes} minutes into this game.";
+            elif (spread < 5000):
+                return "{winningTeam.name}'s maintains a {spread} gold lead, {minutes} minutes into this game.";
+            else:
+                return "It's {minutes} minutes in it's looking harder and harder for {losingTeam.name} team to turn this game around. The {winningTeam.name} gold lead has grown to over {spread}.";
 
     def selectMessageTemplateSalliStyle(self, messageType, messageArgs):
         if (messageType == CommentaryType.Introduction):
@@ -96,3 +111,18 @@ class Actor(object):
             playerLevel = messageArgs["player"].level;
             if (playerLevel == 6 or playerLevel == 11 or playerLevel == 16):
                 return "{player.champion} just reached level {player.level}. The {enemyTeam.name} better watch out for that.";
+        elif (messageType == CommentaryType.GameState):
+            winningTeam = messageArgs["winningTeam"]
+            losingTeam = messageArgs["losingTeam"]
+            spread = messageArgs["spread"]
+
+            if (spread == 0):
+                return "The game is currently dead even {minutes} minutes into this game.";
+            if (spread < 500):
+                return "It's {minutes} minutes in and the game is close with just a {spread} gold lead in {winningTeam.name}'s favor.";
+            elif (spread < 2000):
+                return "{winningTeam.name}'s lead stands at {spread}, {minutes} minutes into this game.";
+            elif (spread < 5000):
+                return "{winningTeam.name}'s maintains a {spread} gold lead, {minutes} minutes into this game.";
+            else:
+                return "It's {minutes} minutes in it's looking harder and harder for {losingTeam.name} team to turn this game around. The {winningTeam.name} gold lead has grown to over {spread}.";

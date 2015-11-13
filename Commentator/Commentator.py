@@ -30,6 +30,8 @@ class Commentator(Thread):
 
 	def reset(self):
 		self.lastMessageTime = 0;
+		self.lastStateMessage = 0;
+		self.idleTimeToWaitBeforeGivingState = random.randint(10, 30);
 
 		self.gameProperties = ["GameTime"];
 		self.game = Game.Game();
@@ -89,10 +91,29 @@ class Commentator(Thread):
 				if (event.propertyName in self.gameProperties):
 					if (self.game.update(event)):
 						if (event.propertyName == "GameTime"):
-							if (self.lastMessageTime > 0) and (self.game.time > self.lastMessageTime):
+							if (self.lastMessageTime > 0) and ((self.game.time - self.lastMessageTime) > self.idleTimeToWaitBeforeGivingState) and ((self.lastStateMessage == 0) or ((self.game.time - self.lastStateMessage) > 60)):
 								messageType = CommentaryType.GameState;
+								messageArgs["game"] = self.game;
 								messageArgs["teams"] = self.teams;
 								messageArgs["players"] = self.players;
+
+								spread = abs(self.teams[0].goldTotal - self.teams[1].goldTotal);
+
+								if (spread < 100):
+									pass;
+								elif (spread < 1000):
+									spread = spread - (spread % 100);
+								else:
+									spread = spread - (spread % 1000);
+
+								messageArgs["spread"]  = spread;
+								messageArgs["winningTeam"] = self.teams[0] if self.teams[0].goldTotal > self.teams[1].goldTotal else self.teams[1];
+								messageArgs["losingTeam"] = self.teams[0] if self.teams[0].goldTotal <= self.teams[1].goldTotal else self.teams[1];
+								messageArgs["minutes"] = self.game.time / 60;
+								messageArgs["seconds"] = (self.game.time % 60);
+
+								self.lastStateMessage = self.game.time;
+								self.idleTimeToWaitBeforeGivingState = random.randint(10, 30);
 
 				if (event.propertyName in self.playerProperties):
 					player = self.players[event.sourceId];
@@ -100,16 +121,18 @@ class Commentator(Thread):
 					if (player.update(event)):
 						if (event.propertyName == "GoldTotal"):
 							teamGoldTotal = 0
+							base = 0 if event.sourceId < 5 else 5;
 
 							for i in range(4):
-								teamGoldTotal = teamGoldTotal + self.players[i].goldTotal;
+								teamGoldTotal = teamGoldTotal + self.players[base + i].goldTotal;
 
 							self.eventQueue.put(Messages.PropertyChangeMessage("TeamGoldTotal", 0 if event.sourceId < 5 else 1, teamGoldTotal))
 						elif (event.propertyName == "GoldCurrent"):
 							teamGoldCurrent = 0
+							base = 0 if event.sourceId < 5 else 5;
 
 							for i in range(4):
-								teamGoldCurrent = teamGoldCurrent + self.players[i].goldCurrent;
+								teamGoldCurrent = teamGoldCurrent + self.players[base + i].goldCurrent;
 
 							self.eventQueue.put(Messages.PropertyChangeMessage("TeamGoldCurrent", 0 if event.sourceId < 5 else 1, teamGoldCurrent))
 						elif (event.propertyName == "Level"):
