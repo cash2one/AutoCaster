@@ -17,7 +17,7 @@ class AudioRenderer(Thread):
                 "GDNAJCIHKDP2YAKG664A",
                 "8yaFb9+jGeuI8DDrYKdK+9jUVNAqqYRuxyG254la"
             )
-        self.v.codec = "ogg"
+        self.v.codec = "mp3"
         self.v.region = "us-west"
 
     def run(self):
@@ -34,7 +34,7 @@ class AudioRenderer(Thread):
             sha256 = hashlib.sha256(speech + rate + voice_name)
             hash_string = sha256.hexdigest()
 
-            output_file = AUDIO_DIRECTORY + hash_string + ".ogg"
+            output_file = AUDIO_DIRECTORY + hash_string + ".mp3"
             if not os.path.isfile(output_file):
                 self.v.speech_rate = rate
                 self.v.voice_name = voice_name

@@ -6,8 +6,8 @@ import socket
 import requests
 import subprocess
 
-ip = "";
-port = 8445;
+ip = "127.0.0.1";
+port = 8444;
 
 
 class EventParser(Thread):
@@ -15,15 +15,17 @@ class EventParser(Thread):
         Thread.__init__(self);
         self.eventQueue = eventQueue;
 
-        self.eventPattern = re.compile("^\((\w+)\)(.*)$");
+        self.eventPattern = re.compile("^\(([_\w]+)\)(.*)$");
         self.propertySourcePattern = re.compile("(\w+)_(\d+)");
         self.initPattern = re.compile("([^,:]+),([^,:]+),img...__(........),img");
         self.killPattern = re.compile("1,img...__(........),([-\d]+),([-\d]+),img...__(........),([-\d]+),([-\d]+),img...__(........),([-\d]+)(,.*)?$");
         self.killAssistsPattern = re.compile("img...__([A-Fa-f0-9]{8})");
 
+        self.buffer = "";
+
     def run(self):
         print "Generating event";
-        self.runFromFile();
+        #self.runFromFile();
         self.runFromGame();
 
     def runFromGame(self):
@@ -39,10 +41,10 @@ class EventParser(Thread):
 
         self.startLeague(gameID, encryptionKey)
         (client, address) = s.accept()
+        #client.setblocking(False)
         while True:
             line = self.read_line(client)
-            print(line)
-            match = self.eventPattern.match(line);
+            self.processLine(line);
 
     def runFromFile(self):
         f = open('game.txt', 'r');
@@ -51,6 +53,8 @@ class EventParser(Thread):
 
     def processLine(self, line):
         match = self.eventPattern.match(line);
+
+        #print line;
 
         if (match):
             groups = match.groups();
@@ -76,10 +80,11 @@ class EventParser(Thread):
                             propertyName = propertyGroups[0];
                             propertySource = int(propertyGroups[1]);
 
-                        #self.eventQueue.put(Messages.PropertyChangeMessage(propertyName, propertySource, propertyValue));
+                        self.eventQueue.put(Messages.PropertyChangeMessage(propertyName, propertySource, propertyValue));
                 elif (eventSource == "Init"):
                     self.eventQueue.put(self.parseInit(data));
                 elif (eventSource == "AddMessage"):
+                    print "AddMessage " + data;
                     self.eventQueue.put(self.parseKillMessage(data));
 
 
@@ -125,13 +130,18 @@ class EventParser(Thread):
         ret = ''
 
         while True:
-            c = s.recv(1)
+            data = s.recv(1024);
 
-            if c == '\n' or c == '':
-                break
-            else:
-                ret += c
-        return ret
+            if not data:
+                break;
+            
+            self.buffer = self.buffer + data;
+
+            if ('\n' in self.buffer):
+                (line, self.buffer) = self.buffer.split("\n", 1);
+                return line;
+
+        return self.buffer;
 
     def requestFeaturedGameMode(self):
         r = requests.get('https://na.api.pvp.net/observer-mode/rest/featured?api_key=3c8bb0c2-ac29-4441-8211-35f44a2cd943');
@@ -145,7 +155,7 @@ class EventParser(Thread):
 
     def startLeague(self, gameID, encryptionKey):
         cwd = "C:\\Riot Games\\League of Legends\\RADS\\solutions\\lol_game_client_sln\\releases\\0.0.1.111\\deploy\\"
-        print cwd
+        #print cwd
         p = subprocess.Popen([
                 cwd + "League of Legends.exe",
                 "8394",

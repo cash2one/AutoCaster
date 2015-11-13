@@ -40,7 +40,7 @@ class Commentator(Thread):
 					player.champion = event.championNames[i];
 					player.dataId = event.dataIds[i];
 
-					#print "Champion " + player.champion + ": " + player.dataId;
+					print "Champion " + player.champion + ": " + player.dataId;
 			elif (isinstance(event, Messages.PropertyChangeMessage)):
 				if (event.propertyName in self.playerProperties):
 					player = self.players[event.sourceId];
@@ -49,7 +49,7 @@ class Commentator(Thread):
 
 					message = "{c} has scored a kill.".format(c = player.champion);
 
-					self.processEvent(Messages.CommentaryMessage(message));
+					#self.processEvent(Messages.CommentaryMessage(message));
 			elif (isinstance(event, Messages.KillMessage)):
 				killer = self.findPlayerByDataId(event.killerId);
 				victim = self.findPlayerByDataId(event.victimId);
