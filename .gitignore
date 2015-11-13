@@ -1,3 +1,4 @@
 node_modules
 *.pyc
 /Commentator/audio
+/Commentator/.idea

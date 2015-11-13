@@ -55,7 +55,7 @@ class Commentator(Thread):
 							self.processEvent(Messages.CommentaryMessage(message));
 				elif (event.propertyName in self.teamProperties):
 					team = self.teams[event.sourceId];
-					
+
 					if (team.update(event)):
 						message = None;
 
@@ -65,7 +65,6 @@ class Commentator(Thread):
 							else:
 								message = "The {t} team has slain their {n} dragon.".format(t = team.name, n = self.numberTh[event.value - 1]);
 						elif (event.propertyName == "TowerKills"):
-							print ">>> " + str(event.value);
 							if (event.value == 1):
 								message = "{t} team has just taken their first tower.".format(t = team.name);
 							elif (event.value == 11):
@@ -90,7 +89,7 @@ class Commentator(Thread):
 
 				if killer and victim:
 					message = "{k} has killed {v}".format(k = killer.champion, v = victim.champion);
-					#self.processEvent(Messages.CommentaryMessage(message));
+					self.processEvent(Messages.CommentaryMessage(message));
 
 			elif (isinstance(event, Messages.BuildingKillMessage)):
 				killer = self.findPlayerByDataId(event.killerId);
