@@ -142,7 +142,7 @@ class EventParser(Thread):
         while True:
             try:
                 data = s.recv(1024);
-            except error as e:
+            except Error as e:
                 break;
 
             if not data:
@@ -157,12 +157,14 @@ class EventParser(Thread):
         return self.buffer;
 
     def requestFeaturedGameMode(self):
+		print "Fetching featured game..."
         r = requests.get('https://na.api.pvp.net/observer-mode/rest/featured?api_key=3c8bb0c2-ac29-4441-8211-35f44a2cd943');
         # print r.status_code
         if (r.status_code == 200):
             json = r.json()
             gameID = str(json['gameList'][0]['gameId'])
             encryptionKey = json['gameList'][0]['observers']['encryptionKey']
+			print "Fetched a featured game."
             return (gameID, encryptionKey)
         return False
 
