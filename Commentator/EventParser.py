@@ -15,6 +15,7 @@ class EventParser(Thread):
 
 		self.eventPattern = re.compile("^\((\w+)\)(.*)$");
 		self.propertySourcePattern = re.compile("(\w+)_(\d+)");
+		self.initPattern = re.compile("([^,:]+),([^,:]+),img");
 
 	def run(self):
 		print "Generating event";
@@ -56,11 +57,13 @@ class EventParser(Thread):
 							if (propertyMatch):
 								propertyGroups = propertyMatch.groups();
 								propertyName = propertyGroups[0];
-								propertySource = propertyGroups[1];
+								propertySource = int(propertyGroups[1]);
 
-							self.eventQueue.put(Messages.PropertyChangeMessage(eventSource, propertyName, propertySource, propertyValue));
-					else:
+							self.eventQueue.put(Messages.PropertyChangeMessage(propertyName, propertySource, propertyValue));
+					elif (eventSource == "Init"):
+						self.eventQueue.put(self.parseInit(data));
 						pass
+
 
 		
 def read_line(s):
@@ -74,3 +77,21 @@ def read_line(s):
 		else:
 		    ret += c
 	return ret
+
+	def parseInit(self, rawData):
+		groups = self.initPattern.findall(rawData);
+
+		if (groups):
+			summonerNames = [];
+			championNames = [];
+
+			i = 0;
+			while i < len(groups):
+				summonerName = groups[i][0];
+				championName = groups[i][1];
+				i = i + 1
+
+				summonerNames.append(summonerName);
+				championNames.append(championName);
+
+			return Messages.InitMessage(summonerNames, championNames);

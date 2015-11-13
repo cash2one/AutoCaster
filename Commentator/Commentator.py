@@ -16,6 +16,7 @@ class Commentator(Thread):
 		for i in range(2):
 			self.teams.append(Game.Team(i));
 
+		self.playerProperties = ["Kills", "KillCount"];
 		self.players = [];
 
 		for i in range(10):
@@ -32,11 +33,20 @@ class Commentator(Thread):
 		while True:
 			event = self.eventQueue.get(True);
 
-			if (isinstance(event, Messages.PropertyChangeMessage)):
-				if ("kill" in event.propertyName.lower()):
-					print "Property: {p}, Source: {s}, Value: {v}".format(p=event.propertyName, s=event.sourceId, v=event.value);
+			if (isinstance(event, Messages.InitMessage)):
+				for i in range(10):
+					player = self.players[i];
+					player.name = event.summonerNames[i];
+					player.champion = event.championNames[i];
+			elif (isinstance(event, Messages.PropertyChangeMessage)):
+				if (event.propertyName in self.playerProperties):
+					player = self.players[event.sourceId];
 
-			self.processEvent(event);
+					self.players[event.sourceId].update(event);
+
+					message = "{c} has scored a kill.".format(c = player.champion);
+
+					self.processEvent(Messages.CommentaryMessage(message));
 
 	def processEvent(self, event):
 		self.commentatorQueue.put(event);
