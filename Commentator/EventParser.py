@@ -16,7 +16,7 @@ class EventParser(Thread):
         self.eventQueue = eventQueue;
 
         self.eventPattern = re.compile("^\(([_\w]+)\)(.*)$");
-        self.propertySourcePattern = re.compile("(\w+)_?(\d+)");
+        self.propertySourcePattern = re.compile("([^_]+)_?(\d+)");
         self.initPattern = re.compile("([^,:]+),([^,:]+),img...__(........),img");
         self.killPattern = re.compile("1,img...__(........),([-\d]+),([-\d]+),img...__(........),([-\d]+),([-\d]+),img...__(........),([-\d]+)(,.*)?$");
         self.killAssistsPattern = re.compile("img...__([A-Fa-f0-9]{8})")
@@ -25,8 +25,8 @@ class EventParser(Thread):
 
     def run(self):
         print "Generating event"
-        self.runFromFile()
-        # self.runFromGame()
+        #self.runFromFile()
+        self.runFromGame()
 
     def runFromGame(self):
         try:

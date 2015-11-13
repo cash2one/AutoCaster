@@ -29,7 +29,8 @@ class Player(object):
         self.cs = 0
         self.level = 1
         self.exp = 0
-        self.gold = 0
+        self.goldTotal = 0
+        self.goldCurrent = 0
 
     def update(self, propertyChangedEvent):
         if (propertyChangedEvent.propertyName == "Kills"):
@@ -52,5 +53,15 @@ class Player(object):
                 return False;
 
             self.level = propertyChangedEvent.value;
+        elif (propertyChangedEvent.propertyName == "GoldTotal"):
+            if (self.goldTotal == propertyChangedEvent.value):
+                return False;
+
+            self.goldTotal = propertyChangedEvent.value;
+        elif (propertyChangedEvent.propertyName == "GoldCurrent"):
+            if (self.goldCurrent == propertyChangedEvent.value):
+                return False;
+
+            self.goldCurrent = propertyChangedEvent.value;
 
         return True;

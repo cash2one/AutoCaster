@@ -20,13 +20,13 @@ class Commentator(Thread):
 		riv_bot = self.commentators[0]
 		salli_bot = self.commentators[1]
 
-		self.teamProperties = ["DragonBuffs", "TowerKills"];
+		self.teamProperties = ["DragonBuffs", "TowerKills", "TeamGoldTotal", "TeamGoldCurrent"];
 		self.teams = [];
 
 		for i in range(2):
 			self.teams.append(Game.Team(i));
 
-		self.playerProperties = ["Kills", "KillCount", "Heath", "Level"];
+		self.playerProperties = ["Kills", "KillCount", "Heath", "Level", "GoldTotal", "GoldCurrent"];
 		self.players = [];
 
 		for i in range(10):
@@ -59,6 +59,21 @@ class Commentator(Thread):
 
 					if (player.update(event)):
 						message = None;
+
+						if (event.propertyName == "GoldTotal"):
+							teamGoldTotal = 0
+
+							for i in range(4):
+								teamGoldTotal = teamGoldTotal + self.players[i].goldTotal;
+
+							self.eventQueue.put(Messages.PropertyChangeMessage("TeamGoldTotal", 0 if event.sourceId < 5 else 1, teamGoldTotal))
+						elif (event.propertyName == "GoldCurrent"):
+							teamGoldCurrent = 0
+
+							for i in range(4):
+								teamGoldCurrent = teamGoldCurrent + self.players[i].goldCurrent;
+
+							self.eventQueue.put(Messages.PropertyChangeMessage("TeamGoldCurrent", 0 if event.sourceId < 5 else 1, teamGoldCurrent))
 
 						if (message):
 							self.processMessage(bot, message)
@@ -124,6 +139,5 @@ class Commentator(Thread):
 				return player;
 
 	def processMessage(self, actor, message, rate="medium", volume=0.8, pitch=1.0):
-		if random.randint(0, 10) < 3:
-			self.commentatorQueue.put(actor.generateMessage(message, rate, volume, pitch))
+		self.commentatorQueue.put(actor.generateMessage(message, rate, volume, pitch))
 

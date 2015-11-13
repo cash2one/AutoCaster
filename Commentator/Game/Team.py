@@ -5,7 +5,8 @@ class Team(object):
         self.name = "blue" if (id == 0) else "red";
         self.towersKilled = 0
         self.dragonCount = 0
-        self.totalGold = 0
+        self.goldTotal = 0
+        self.goldCurrent = 0
         self.totalKills = 0
 
 
@@ -20,5 +21,15 @@ class Team(object):
                 return False;
 
             self.towersKilled = propertyChangedEvent.value;
+        elif (propertyChangedEvent.propertyName == "TeamGoldTotal"):
+            if (self.goldTotal == propertyChangedEvent.value):
+                return False;
+
+            self.goldTotal = propertyChangedEvent.value;
+        elif (propertyChangedEvent.propertyName == "TeamGoldCurrent"):
+            if (self.goldCurrent == propertyChangedEvent.value):
+                return False;
+
+            self.goldCurrent = propertyChangedEvent.value;
 
         return True;
