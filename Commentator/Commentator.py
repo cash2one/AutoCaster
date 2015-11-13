@@ -1,6 +1,7 @@
 from threading import Thread
 import Messages
 import Game
+from CommentaryType import CommentaryType
 import json
 import time
 from Actor import Actor
@@ -20,22 +21,44 @@ class Commentator(Thread):
 		riv_bot = self.commentators[0]
 		salli_bot = self.commentators[1]
 
+		self.reset();
+
+		with open("Config.json") as configFile:
+			config = json.load(configFile)
+	
+		self.numberTh = ["first", "second", "third", "forth", "fifth", "sixth", "seventh", "eigth", "ninth", "tenth", "eleventh" ];
+
+	def reset(self):
+		self.gameProperties = ["GameTime"];
+		self.game = Game.Game();
+
 		self.teamProperties = ["DragonBuffs", "TowerKills", "TeamGoldTotal", "TeamGoldCurrent"];
 		self.teams = [];
 
 		for i in range(2):
 			self.teams.append(Game.Team(i));
 
-		self.playerProperties = ["Kills", "KillCount", "Heath", "Level", "GoldTotal", "GoldCurrent"];
+		self.playerProperties = ["Kills", "KillCount", "Health", "Level", "GoldTotal", "GoldCurrent"];
 		self.players = [];
 
 		for i in range(10):
 			self.players.append(Game.Player(i));
 
-		with open("Config.json") as configFile:
-			config = json.load(configFile)
-	
-		self.numberTh = ["first", "second", "third", "forth", "fifth", "sixth", "seventh", "eigth", "ninth", "tenth", "eleventh" ];
+	def introduceActors(self, initEvent):
+		messageArgs = {}
+		messageArgs["joiner"] = False;
+
+		for i in range(len(self.commentators)):
+			bot = self.commentators[i];
+			messageArgs["bot"] = bot
+			self.processMessage(bot, CommentaryType.Introduction, messageArgs);
+			messageArgs["joiner"] = True;
+
+		bot = self.commentators[0]
+		messageArgs["bot"] = bot
+		messageArgs["players"] = self.players;
+		messageArgs["joiner"] = False;
+		self.processMessage(bot, CommentaryType.GameSummary, messageArgs)
 
 	def run(self):
 		print "Commentator started";
@@ -43,9 +66,14 @@ class Commentator(Thread):
 		while True:
 			event = self.eventQueue.get(True);
 
+			messageType = None;
+			messageArgs = {}
+
 			bot = self.commentators[random.randint(0,1)]
 
 			if (isinstance(event, Messages.InitMessage)):
+				self.reset();
+
 				for i in range(10):
 					player = self.players[i];
 					player.name = event.summonerNames[i];
@@ -53,13 +81,16 @@ class Commentator(Thread):
 					player.dataId = event.dataIds[i];
 
 					#print "Champion " + player.champion + ": " + player.dataId;
+
+				self.introduceActors(event);
 			elif (isinstance(event, Messages.PropertyChangeMessage)):
+				if (event.propertyName in self.gameProperties):
+					if (self.game.update(event)):
+						pass
 				if (event.propertyName in self.playerProperties):
 					player = self.players[event.sourceId];
 
 					if (player.update(event)):
-						message = None;
-
 						if (event.propertyName == "GoldTotal"):
 							teamGoldTotal = 0
 
@@ -74,30 +105,21 @@ class Commentator(Thread):
 								teamGoldCurrent = teamGoldCurrent + self.players[i].goldCurrent;
 
 							self.eventQueue.put(Messages.PropertyChangeMessage("TeamGoldCurrent", 0 if event.sourceId < 5 else 1, teamGoldCurrent))
-
-						if (message):
-							self.processMessage(bot, message)
 				elif (event.propertyName in self.teamProperties):
 					team = self.teams[event.sourceId];
 
 					if (team.update(event)):
-						message = None;
+	
 
 						if (event.propertyName == "DragonBuffs"):
-							if (event.value == 1):
-								message = "{t} team has just slain their first dragon of the game.".format(t = team.name);
-							else:
-								message = "The {t} team has slain their {n} dragon.".format(t = team.name, n = self.numberTh[event.value - 1]);
+							messageType = CommentaryType.DragonKill;
 						elif (event.propertyName == "TowerKills"):
-							if (event.value == 1):
-								message = "{t} team has just taken their first tower.".format(t = team.name);
-							elif (event.value == 11):
-								message = "{t} team has just the last tower of the game and only the nexus remains.".format(t = team.name);
-							else:
-								message = "{t} team has taken their {n} tower of the game.".format(t = team.name, n = self.numberTh[event.value - 1]);
+							messageType = CommentaryType.BuildingKill;
 
-						if (message):
-							self.processMessage(bot, message)
+						if (messageType):
+							messageArgs["team"] = team;
+							messageArgs["enemyTeam"] = self.teams[0] if team.id == 1 else self.teams[1]
+							messageArgs["nth"] = self.numberTh[event.value - 1]
 			elif (isinstance(event, Messages.KillMessage)):
 				killer = self.findPlayerByDataId(event.killerId);
 				victim = self.findPlayerByDataId(event.victimId);
@@ -112,32 +134,21 @@ class Commentator(Thread):
 							assists.append(assist.champion);
 
 				if killer and victim:
-					message = "{k} has killed {v}".format(k = killer.champion, v = victim.champion);
-					self.processMessage(bot, message)
+					messageType = CommentaryType.ChampionKill;
+					messageArgs = {}
+					messageArgs["killer"] = killer;
+					messageArgs["killerTeam"] = self.teams[0] if killer.id < 5 else self.teams[1];
+					messageArgs["victim"] = victim;
+					messageArgs["victimTeam"] = self.teams[0] if victim.id < 5 else self.teams[1];
 
-			elif (isinstance(event, Messages.BuildingKillMessage)):
-				killer = self.findPlayerByDataId(event.killerId);
-				building = "";
-
-				if killer and building:
-					message = "{k} has destroyed {v}".format(k = killer.champion, v = building);
-
-					self.processMessage(bot, message)
-
-			elif (isinstance(event, Messages.MonsterKillMessage)):
-				killer = self.findPlayerByDataId(event.killerId);
-				monster = "";
-
-				if killer and monster:
-					message = "{k} has slain {v}".format(k = killer.champion, v = monster);
-
-					self.processMessage(bot, message)
+			if (messageType):
+				self.processMessage(bot, messageType, messageArgs)
 
 	def findPlayerByDataId(self, dataId):
 		for player in self.players:
 			if (player.dataId == dataId):
 				return player;
 
-	def processMessage(self, actor, message, rate="medium", volume=0.8, pitch=1.0):
-		self.commentatorQueue.put(actor.generateMessage(message, rate, volume, pitch))
+	def processMessage(self, actor, messageType, messageArgs, rate="medium", volume=0.8, pitch=1.0):
+		self.commentatorQueue.put(actor.generateMessage(messageType, messageArgs, rate, volume, pitch))
 

@@ -11,7 +11,7 @@ class AudioRenderer(Thread):
     def __init__(self, commentatorQueue, rendererQueue):
         Thread.__init__(self)
         self.commentatorQueue = commentatorQueue
-        self.rendererQueue = rendererQueue
+        self.rendererQueue = rendererQueue  
         self.v = pyvona.create_voice(
                 "GDNAJCIHKDP2YAKG664A",
                 "8yaFb9+jGeuI8DDrYKdK+9jUVNAqqYRuxyG254la"
