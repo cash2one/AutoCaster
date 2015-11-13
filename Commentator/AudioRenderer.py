@@ -19,9 +19,9 @@ class AudioRenderer(Thread):
         self.v.codec = "mp3"
         self.v.region = "us-west"
 
-    def getFilename(self, directory, speech, medium, voice_name):
+    def getFilename(self, directory, speech, rate, voice_name):
         speech = speech.replace(" ", "").replace("\'","")
-        return directory + speech + medium + voice_name + ".mp3"
+        return directory + speech + rate + voice_name + ".mp3"
 
     def run(self):
         while True:
@@ -35,7 +35,7 @@ class AudioRenderer(Thread):
             rate = "medium"
             voice_name = "Brian"
 
-            filename = self.getFilename(AUDIO_DIRECTORY, directory, speech, medium, voice_name)
+            output_file = self.getFilename(AUDIO_DIRECTORY, speech, rate, voice_name)
             if not os.path.isfile(output_file):
                 self.v.speech_rate = rate
                 self.v.voice_name = voice_name
