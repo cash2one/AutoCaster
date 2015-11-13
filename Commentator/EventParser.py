@@ -31,6 +31,7 @@ class EventParser(Thread):
     def runFromGame(self):
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         except socket.error as err:
             print "Socket creation failed."
             return
@@ -47,7 +48,7 @@ class EventParser(Thread):
                 line = self.read_line(client)
                 self.processLine(line)
 
-                if not ps.returncode:
+                if not (ps.returncode == None):
                     break
 
     def runFromFile(self):
@@ -57,8 +58,6 @@ class EventParser(Thread):
 
     def processLine(self, line):
         match = self.eventPattern.match(line);
-
-        #print line;
 
         if (match):
             groups = match.groups();

@@ -34,7 +34,7 @@ class Commentator(Thread):
 			event = self.eventQueue.get(True);
 
 			if (isinstance(event, Messages.InitMessage)):
-				for i in range(10):
+				for i in range(len(event.summonerNames)):
 					player = self.players[i];
 					player.name = event.summonerNames[i];
 					player.champion = event.championNames[i];
