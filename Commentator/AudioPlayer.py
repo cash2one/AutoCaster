@@ -20,7 +20,7 @@ class AudioPlayer(Thread):
             now_timestamp = datetime.now()
             diff = now_timestamp - message_timestamp
 
-            if diff.total_seconds() > 5:
+            if diff.total_seconds() > 30:
                 continue
 
             mp3 = MP3(audio_file)
