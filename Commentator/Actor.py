@@ -138,7 +138,7 @@ class Actor(object):
         elif (messageType == CommentaryType.LevelUp):
             playerLevel = messageArgs["player"].level;
             if (playerLevel == 6 or playerLevel == 11 or playerLevel == 16):
-                return "{player.champion} just reached level {player.level}. The {enemyTeam.name} better watch out for that.";
+                return "{player.champion} just reached level {player.level}.";
         elif (messageType == CommentaryType.GameState):
             winningTeam = messageArgs["winningTeam"]
             losingTeam = messageArgs["losingTeam"]
