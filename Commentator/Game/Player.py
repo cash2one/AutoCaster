@@ -33,10 +33,24 @@ class Player(object):
 
     def update(self, propertyChangedEvent):
         if (propertyChangedEvent.propertyName == "Kills"):
+            if (self.kills == propertyChangedEvent.value):
+                return False;
+
             self.kills = propertyChangedEvent.value;
         elif (propertyChangedEvent.propertyName == "KillCount"):
+            if (self.killCount == propertyChangedEvent.value):
+                return False;
+
             self.killCount = propertyChangedEvent.value;
         elif (propertyChangedEvent.propertyName == "Heatlh"):
+            if (self.health == propertyChangedEvent.value):
+                return False;
+
             self.health = propertyChangedEvent.value;
         elif (propertyChangedEvent.propertyName == "Level"):
+            if (self.level == propertyChangedEvent.value):
+                return False;
+
             self.level = propertyChangedEvent.value;
+
+        return True;
