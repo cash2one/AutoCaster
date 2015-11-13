@@ -46,10 +46,9 @@ class EventParser(Thread):
 
             while True:
                 line = self.read_line(client)
-                print line
                 self.processLine(line)
-                print ps.returncode
 
+                ps.poll()
                 if not (ps.returncode == None):
                     break
 
@@ -145,7 +144,6 @@ class EventParser(Thread):
             try:
                 data = s.recv(1024);
             except:
-                print "exception caught"
                 break;
 
             if not data:
