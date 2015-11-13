@@ -1,6 +1,7 @@
 import json
 from CommentaryType import CommentaryType
 from Messages import CommentaryMessage
+import random;
 
 PRONUNCIATION_DIR = "./pronounce/"
 
@@ -46,29 +47,56 @@ class Actor(object):
     def selectMessageTemplateBrianStyle(self, messageType, messageArgs):
         if (messageType == CommentaryType.Introduction):
             if (messageArgs["joiner"]):
-                return "and I'm {bot.name}";
+                return random.choice([
+                    "and I'm {bot.name}",
+                    "and I continue to be the one and only {bot.name}"
+                ]);
 
-            return "Hi, I'm {bot.name}";
+            return random.choice([
+                "Hi, I'm {bot.name}",
+                "It's {bot.name} once again"
+            ]);
         elif (messageType == CommentaryType.GameSummary):
             return "Today we'll see the blue team's {players[0].champion}, {players[1].champion}, {players[2].champion}, {players[3].champion} and {players[4].champion} facing off against the red team's {players[5].champion}, {players[6].champion}, {players[7].champion}, {players[8].champion} and {players[9].champion}";
         elif (messageType == CommentaryType.ChampionKill):
-            return "{killer.champion} has just killed {victim.champion}";
+            return random.choice([
+                "{killer.champion} has just killed {victim.champion}",
+                "{killer.champion} has taken out {victim.champion}",
+                "{killer.champion} ended {victim.champion}",
+                "{victim.champion} just had their life bar eliminated by {killer.champion}",
+                "{killer.champion} took out {victim.champion} and claim himself a little bit of gold."
+            ]);
         elif (messageType == CommentaryType.BuildingKill):
             if (messageArgs["team"].towersKilled == 1):
-                return "{team.name} team has just taken their first tower.";
+                return random.choice([
+                    "{team.name} team has just taken their first tower.",
+                    "The {team.name} is advancing across the rift taking out their first {enemyTeam.name} tower"
+                ]);
             elif (messageArgs["team"].towersKilled == 11):
                 return "{team.name} team has just the last tower of the game and only the nexus remains.";
             else:
-               return "{team.name} team has taken their {nth} tower of the game.";
+               return random.choice([
+                    "{team.name} team has taken their {nth} tower of the game.",
+                    "The {team.name} continues to invade {enemyTeam.name} territory, taking out another one of their towers."
+                ]);
         elif (messageType == CommentaryType.DragonKill):
+            message = "";
+
             if (messageArgs["team"].dragonCount == 1):
-                return "{team.name} team has just slain their {nth} dragon of the game.";
+                message = "{team.name} team has just slain their {nth} dragon of the game.";
             else:
-                return "The {team.name} team has slain their {nth} dragon.";
+                message = "The {team.name} team has slain their {nth} dragon.";
+
+                if (messageArgs["enemyTeam"].dragonCount == 0):
+                    message = message + " " + random.choice([
+                        "The {enemyTeam.name} has yet to pick up one for themselves.",
+                        "The {enemyTeam.name} still hasn't secured their own."
+                    ]);
         elif (messageType == CommentaryType.LevelUp):
             playerLevel = messageArgs["player"].level;
             if (playerLevel == 6 or playerLevel == 11 or playerLevel == 16):
-                return "{player.champion} just reached level {player.level}. The {enemyTeam.name} better watch out for that.";
+                if (random.randint(1, 3) == 1):
+                    return "{player.champion} just reached level {player.level}.";
         elif (messageType == CommentaryType.GameState):
             winningTeam = messageArgs["winningTeam"]
             losingTeam = messageArgs["losingTeam"]
