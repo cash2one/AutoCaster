@@ -2,6 +2,7 @@
 class Player(object):
     def __init__(self, id):
         self.id = id;
+        self.dataId = 0;
         self.name = ""
         self.champion = ""
         self.isAlive = False

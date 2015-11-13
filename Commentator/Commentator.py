@@ -38,6 +38,7 @@ class Commentator(Thread):
 					player = self.players[i];
 					player.name = event.summonerNames[i];
 					player.champion = event.championNames[i];
+					player.dataId = event.dataIds[i];
 			elif (isinstance(event, Messages.PropertyChangeMessage)):
 				if (event.propertyName in self.playerProperties):
 					player = self.players[event.sourceId];
@@ -48,6 +49,10 @@ class Commentator(Thread):
 
 					self.processEvent(Messages.CommentaryMessage(message));
 
+	def findPlayerByDataId(self, dataId):
+		for player in players:
+			if (player.dataId == dataId):
+				return player;
+
 	def processEvent(self, event):
 		self.commentatorQueue.put(event);
-		pass
