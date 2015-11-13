@@ -24,4 +24,4 @@ class AudioPlayer(Thread):
             self.player.queue(media)
             self.player.seek(0)
             self.player.play()
-            print "{} {} {} {}".format(self.player.pitch, self.player.playing, self.player.volume)
+            print "{} {} {}".format(self.player.pitch, self.player.playing, self.player.volume)
