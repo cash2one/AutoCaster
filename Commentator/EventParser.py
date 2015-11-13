@@ -26,7 +26,8 @@ class EventParser(Thread):
     def run(self):
         print "Generating event";
         #self.runFromFile();
-        self.runFromGame();
+        while True:
+            self.runFromGame();
 
     def runFromGame(self):
         try:
@@ -39,12 +40,14 @@ class EventParser(Thread):
         s.bind((ip, port));
         s.listen(2)
 
-        self.startLeague(gameID, encryptionKey)
+        ps = self.startLeague(gameID, encryptionKey)
         (client, address) = s.accept()
         #client.setblocking(False)
         while True:
             line = self.read_line(client)
             self.processLine(line);
+            if (ps.returncode != null):
+                return false
 
     def runFromFile(self):
         f = open('game.txt', 'r');
@@ -163,3 +166,4 @@ class EventParser(Thread):
                 "",
                 "spectate spectator.na.lol.riotgames.com:80 {} {} NA1".format(encryptionKey, gameID)],
                 cwd=cwd)
+        return p
