@@ -24,8 +24,14 @@ class AudioPlayer(Thread):
 
             media = pyglet.media.load(audio_file)
             self.player.volume = volume
+
+            # this isn't well tested
             self.player.next()
+
             self.player.queue(media)
-            self.player.eos_action = 'stop'
             self.player.play()
+
+            # maybe this should be 'next'
+            self.player.eos_action = 'stop'
+
             # print "{} {} {}".format(self.player.pitch, self.player.playing, self.player.volume)
