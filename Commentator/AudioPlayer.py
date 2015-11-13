@@ -18,7 +18,20 @@ class AudioPlayer(Thread):
 
             # print "Audio player an audio file ({}) to play from source {}.".format(audio_file, event["source"])
 
+            if self.player.playing:
+                print "sound currently playing"
+                # return
+
             media = pyglet.media.load(audio_file)
             self.player.volume = volume
+
+            # this isn't well tested
+            self.player.next()
+
             self.player.queue(media)
             self.player.play()
+
+            # maybe this should be 'next'
+            self.player.eos_action = 'stop'
+
+            # print "{} {} {}".format(self.player.pitch, self.player.playing, self.player.volume)

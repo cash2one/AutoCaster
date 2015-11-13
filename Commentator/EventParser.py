@@ -1,13 +1,13 @@
-from threading import Thread;
-import Messages;
-import time;
-import re;
-import socket;
-import requests;
+from threading import Thread
+import Messages
+import time
+import re
+import socket
+import requests
 from subprocess import check_call;
 
-ip = "192.168.203.180";
-port = 8445;
+ip = "127.0.0.1";
+port = 8444;
 
 
 class EventParser(Thread):
@@ -15,37 +15,46 @@ class EventParser(Thread):
         Thread.__init__(self);
         self.eventQueue = eventQueue;
 
-        self.eventPattern = re.compile("^\((\w+)\)(.*)$");
-        self.propertySourcePattern = re.compile("(\w+)_?(\d+)");
+        self.eventPattern = re.compile("^\(([_\w]+)\)(.*)$");
+        self.propertySourcePattern = re.compile("(\w+)_(\d+)");
         self.initPattern = re.compile("([^,:]+),([^,:]+),img...__(........),img");
         self.killPattern = re.compile("1,img...__(........),([-\d]+),([-\d]+),img...__(........),([-\d]+),([-\d]+),img...__(........),([-\d]+)(,.*)?$");
-        self.killAssistsPattern = re.compile("img...__([A-Fa-f0-9]{8})");
+        self.killAssistsPattern = re.compile("img...__([A-Fa-f0-9]{8})")
+
+        self.buffer = ""
 
     def run(self):
-        print "Generating event";
-        self.runFromFile();
-        #self.runFromGame();
+        print "Generating event"
+        #self.runFromFile()
+        self.runFromGame()
 
     def runFromGame(self):
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         except socket.error as err:
             print "Socket creation failed."
-            return;
-        
-        (gameID, encryptionKey) = self.requestFeaturedGameMode()
-        s.bind((ip, port));
+            return
+
+        s.bind((ip, port))
         s.listen(2)
-        (client, address) = s.accept()
-        self.startLeague(gameID, encryptionKey)
-        
+
         while True:
-            line = read_line(client)
+            (gameID, encryptionKey) = self.requestFeaturedGameMode()
+            ps = self.startLeague(gameID, encryptionKey)
+            (client, address) = s.accept()
+
+            while True:
+                line = self.read_line(client)
+                self.processLine(line)
+
+                if not (ps.returncode == None):
+                    break
 
     def runFromFile(self):
-        f = open('game.txt', 'r');
+        f = open('game.txt', 'r')
         for line in f:
-            self.processLine(line);
+            self.processLine(line)
 
     def processLine(self, line):
         match = self.eventPattern.match(line);
@@ -60,18 +69,10 @@ class EventParser(Thread):
                 if (eventSource == "Update"):
                     propertyAndValues = data.split(",");
 
-                    if ("Tower" in data):
-                    	print data;
-
                     i = 0;
                     while i < len(propertyAndValues):
                         propertyName = propertyAndValues[i];
-
-                        try:
-                        	propertyValue = int(propertyAndValues[i + 1]);
-                        except:
-                        	propertyValue = propertyAndValues[i + 1];
-
+                        propertyValue = propertyAndValues[i + 1];
                         propertySource = -1;
                         i = i + 2
 
@@ -82,10 +83,11 @@ class EventParser(Thread):
                             propertyName = propertyGroups[0];
                             propertySource = int(propertyGroups[1]);
 
-                        self.eventQueue.put(Messages.PropertyChangeMessage(propertyName, propertySource, propertyValue));
+                        #self.eventQueue.put(Messages.PropertyChangeMessage(propertyName, propertySource, propertyValue));
                 elif (eventSource == "Init"):
                     self.eventQueue.put(self.parseInit(data));
                 elif (eventSource == "AddMessage"):
+                    print "AddMessage " + data;
                     self.eventQueue.put(self.parseKillMessage(data));
 
 
@@ -127,30 +129,41 @@ class EventParser(Thread):
 
             return Messages.KillMessage(victimId, killerId, assistIds);
 
-    def read_line(s):
+    def read_line(self, s):
         ret = ''
 
         while True:
-            c = s.recv(1)
+            data = s.recv(1024);
 
-            if c == '\n' or c == '':
-                break
-            else:
-                ret += c
-        return ret
+            if not data:
+                break;
+            
+            self.buffer = self.buffer + data;
+
+            if ('\n' in self.buffer):
+                (line, self.buffer) = self.buffer.split("\n", 1);
+                return line;
+
+        return self.buffer;
 
     def requestFeaturedGameMode(self):
         r = requests.get('https://na.api.pvp.net/observer-mode/rest/featured?api_key=3c8bb0c2-ac29-4441-8211-35f44a2cd943');
+        # print r.status_code
         if (r.status_code == 200):
             json = r.json()
-            gameID = json['gameList'][0]['gameId']
+            gameID = str(json['gameList'][0]['gameId'])
             encryptionKey = json['gameList'][0]['observers']['encryptionKey']
             return (gameID, encryptionKey)
+        return False
 
     def startLeague(self, gameID, encryptionKey):
-            check_call([
-                r"C:\Riot Games\League of Legends\RADS\solutions\lol_game_client_sln\releases\0.0.1.110\deploy\League of Legends.exe",
+        cwd = "C:\\Riot Games\\League of Legends\\RADS\\solutions\\lol_game_client_sln\\releases\\0.0.1.111\\deploy\\"
+        #print cwd
+        p = subprocess.Popen([
+                cwd + "League of Legends.exe",
                 "8394",
                 "LoLLauncher.exe",
                 "",
-                "spectate spectator.na.lol.riotgames.com:80" + gameID +" "+encryptionKey + " NA1"])
+                "spectate spectator.na.lol.riotgames.com:80 {} {} NA1".format(encryptionKey, gameID)],
+                cwd=cwd)
+        return p
