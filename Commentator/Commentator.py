@@ -1,8 +1,10 @@
-from threading import Thread;
-import Messages;
-import Game;
-import json;
-import time;
+from threading import Thread
+import Messages
+import Game
+import json
+import time
+from Actor import Actor
+import random
 
 class Commentator(Thread):
 	def __init__(self, eventQueue, commentatorQueue):
@@ -10,6 +12,13 @@ class Commentator(Thread):
 
 		self.eventQueue = eventQueue;
 		self.commentatorQueue = commentatorQueue;
+
+        self.commentators = []
+        self.commentators.append(Actor("Rivington the 4th", "Brian", 0))
+        self.commentators.append(Actor("Salli", "Salli", 1))
+
+        riv_bot = self.commentators[0]
+        salli_bot = self.commentators[1]
 
 		self.teamProperties = ["DragonBuffs", "TowerKills"];
 		self.teams = [];
@@ -28,13 +37,13 @@ class Commentator(Thread):
 	
 		self.numberTh = ["first", "second", "third", "forth", "fifth", "sixth", "seventh", "eigth", "ninth", "tenth", "eleventh" ];
 
-		pass;
-
 	def run(self):
 		print "Commentator started";
 
 		while True:
 			event = self.eventQueue.get(True);
+
+            bot = self.commentators[random.randint(0,1)]
 
 			if (isinstance(event, Messages.InitMessage)):
 				for i in range(10):
@@ -52,7 +61,7 @@ class Commentator(Thread):
 						message = None;
 
 						if (message):
-							self.processEvent(Messages.CommentaryMessage(message));
+							self.processMessage(bot, message)
 				elif (event.propertyName in self.teamProperties):
 					team = self.teams[event.sourceId];
 
@@ -73,7 +82,7 @@ class Commentator(Thread):
 								message = "{t} team has taken their {n} tower of the game.".format(t = team.name, n = self.numberTh[event.value - 1]);
 
 						if (message):
-							self.processEvent(Messages.CommentaryMessage(message));
+                    		self.processMessage(bot, message)
 			elif (isinstance(event, Messages.KillMessage)):
 				killer = self.findPlayerByDataId(event.killerId);
 				victim = self.findPlayerByDataId(event.victimId);
@@ -89,7 +98,7 @@ class Commentator(Thread):
 
 				if killer and victim:
 					message = "{k} has killed {v}".format(k = killer.champion, v = victim.champion);
-					self.processEvent(Messages.CommentaryMessage(message));
+                    self.processMessage(bot, message)
 
 			elif (isinstance(event, Messages.BuildingKillMessage)):
 				killer = self.findPlayerByDataId(event.killerId);
@@ -98,7 +107,7 @@ class Commentator(Thread):
 				if killer and building:
 					message = "{k} has destroyed {v}".format(k = killer.champion, v = building);
 
-					self.processEvent(Messages.CommentaryMessage(message));
+                    self.processMessage(bot, message)
 
 			elif (isinstance(event, Messages.MonsterKillMessage)):
 				killer = self.findPlayerByDataId(event.killerId);
@@ -107,12 +116,13 @@ class Commentator(Thread):
 				if killer and monster:
 					message = "{k} has slain {v}".format(k = killer.champion, v = monster);
 
-					self.processEvent(Messages.CommentaryMessage(message));
+                    self.processMessage(bot, message)
 
 	def findPlayerByDataId(self, dataId):
 		for player in self.players:
 			if (player.dataId == dataId):
-				return player;
 
-	def processEvent(self, event):
-		self.commentatorQueue.put(event);
+    def processMessage(self, actor, message, rate="medium", volume=0.8, pitch=1.0):
+        if random.randint(0, 10) < 3:
+            self.commentatorQueue.put(actor.generateMessage(message, rate, volume, pitch))
+
