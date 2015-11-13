@@ -1,4 +1,5 @@
 from threading import Thread
+from datetime import datetime
 import time
 import pyglet
 from mutagen.mp3 import MP3
@@ -16,7 +17,11 @@ class AudioPlayer(Thread):
             volume = event["volume"]
             pitch = event["pitch"]
             message_timestamp = event["timestamp"]
-            now_timestamp = time.time()
+            now_timestamp = datetime.now()
+            diff = now_timestamp - message_timestamp
+
+            if diff.total_seconds() > 5:
+                continue
 
             mp3 = MP3(audio_file)
             media = pyglet.media.load(audio_file)

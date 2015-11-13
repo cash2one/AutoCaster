@@ -1,6 +1,6 @@
 from threading import Thread
 import Messages
-import time
+from datetime import datetime
 import pyvona
 import os.path
 
@@ -28,7 +28,7 @@ class AudioRenderer(Thread):
             event = self.commentatorQueue.get(True)
             # print "Audio renderer recieved commentation."
 
-            timestamp = time.time()
+            timestamp = datetime.now()
             voice_name = event.voice
             speech = event.speech
             source = event.sourceId
