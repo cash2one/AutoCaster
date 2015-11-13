@@ -25,8 +25,8 @@ class EventParser(Thread):
 
     def run(self):
         print "Generating event"
-        #self.runFromFile()
-        self.runFromGame()
+        self.runFromFile()
+        # self.runFromGame()
 
     def runFromGame(self):
         try:
@@ -137,7 +137,7 @@ class EventParser(Thread):
 
             if not data:
                 break;
-            
+
             self.buffer = self.buffer + data;
 
             if ('\n' in self.buffer):
