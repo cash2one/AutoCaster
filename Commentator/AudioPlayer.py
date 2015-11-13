@@ -26,7 +26,6 @@ class AudioPlayer(Thread):
             self.player.volume = volume
             self.player.next()
             self.player.queue(media)
-            self.player.next()
             self.player.eos_action = 'stop'
             self.player.play()
             # print "{} {} {}".format(self.player.pitch, self.player.playing, self.player.volume)
