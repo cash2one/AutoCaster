@@ -37,7 +37,7 @@ class AudioRenderer(Thread):
             pitch = event.pitch
 
             print speech
-            continue;
+            #continue;
 
             output_file = self.getFilename(AUDIO_DIRECTORY, speech, rate, voice_name, volume, pitch)
             if not os.path.isfile(output_file):
