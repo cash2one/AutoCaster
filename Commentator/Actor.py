@@ -81,7 +81,7 @@ class Actor(object):
             else:
                return random.choice([
                     "{team.name} team has taken their {nth} tower of the game.",
-                    "The {team.name} has taken another tower."
+                    "The {team.name} has taken another tower bringing the tower count to {team.towersKilled} to {enemy.towersKilled}."
                 ]);
         elif (messageType == CommentaryType.DragonKill):
             message = "";
@@ -123,7 +123,7 @@ class Actor(object):
                 return random.choice([
                     "and I'm {bot.name}",
                     "and it's {bot.name} joining you again on twitch."
-                )];
+                ]);
 
             return random.choice([
                 "Hi, I'm {bot.name}",
@@ -144,14 +144,14 @@ class Actor(object):
             if (messageArgs["team"].towersKilled == 1):
                 return random.choice([
                     "{team.name} team just destroyed their first tower."
-                )];
+                ]);
             elif (messageArgs["team"].towersKilled == 11):
                 return "{team.name} team has just the last tower of the game and only the nexus remains.";
             else:
                return random.choice([
                    "{team.name} team has taken their {nth} tower of the game.",
                    "{enemyTeam.name} has lost another tower to the {team.name} team."
-                )];
+                ]);
         elif (messageType == CommentaryType.DragonKill):
             message = "";
 
