@@ -29,11 +29,13 @@ class AudioRenderer(Thread):
             # print "Audio renderer recieved commentation."
 
             timestamp = time.time()
-            speech = event.text
-            print speech
+            voice_name = event.voice
+            speech = event.speech
+            source = event.sourceId
+            rate = event.rate
+            volume = event.volume
+            pitch = event.pitch
 
-            rate = "medium"
-            voice_name = "Brian"
 
             output_file = self.getFilename(AUDIO_DIRECTORY, speech, rate, voice_name)
             if not os.path.isfile(output_file):
@@ -43,8 +45,9 @@ class AudioRenderer(Thread):
 
             message = {}
             message["audio_file"] = output_file
-            message["source"] = 0
-            message["volume"] = 0.8
+            message["source"] = source
+            message["volume"] = volume
+            message["pitch"] = pitch
             message["timestamp"] = timestamp
 
             self.rendererQueue.put(message)
