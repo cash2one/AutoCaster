@@ -2,7 +2,6 @@ from threading import Thread
 import Messages
 import time
 import pyvona
-import hashlib
 import os.path
 
 
@@ -20,6 +19,10 @@ class AudioRenderer(Thread):
         self.v.codec = "mp3"
         self.v.region = "us-west"
 
+    def getFilename(self, directory, speech, medium, voice_name):
+        speech = speech.replace(" ", "").replace("\'","")
+        return directory + speech + medium + voice_name + ".mp3"
+
     def run(self):
         while True:
             event = self.commentatorQueue.get(True)
@@ -31,16 +34,12 @@ class AudioRenderer(Thread):
 
             rate = "medium"
             voice_name = "Brian"
-            sha256 = hashlib.sha256(speech + rate + voice_name)
-            hash_string = sha256.hexdigest()
 
-            output_file = AUDIO_DIRECTORY + hash_string + ".mp3"
+            filename = self.getFilename(AUDIO_DIRECTORY, directory, speech, medium, voice_name)
             if not os.path.isfile(output_file):
                 self.v.speech_rate = rate
                 self.v.voice_name = voice_name
                 self.v.fetch_voice(speech, output_file)
-            #else:
-                #print "already exists"
 
             message = {}
             message["audio_file"] = output_file
