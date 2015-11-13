@@ -96,6 +96,8 @@ class Actor(object):
                         "The {enemyTeam.name} has yet to pick up one for themselves.",
                         "The {enemyTeam.name} still hasn't secured their own."
                     ]);
+
+            return message;
         elif (messageType == CommentaryType.LevelUp):
             playerLevel = messageArgs["player"].level;
             if (playerLevel == 6 or playerLevel == 11 or playerLevel == 16):
@@ -165,6 +167,8 @@ class Actor(object):
                         "The {enemyTeam.name} has yet to pick up one for themselves.",
                         "The {enemyTeam.name} still hasn't secured their own."
                     ]);
+
+            return message;
         elif (messageType == CommentaryType.LevelUp):
             playerLevel = messageArgs["player"].level;
             if (playerLevel == 6 or playerLevel == 11 or playerLevel == 16):
