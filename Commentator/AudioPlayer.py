@@ -1,6 +1,7 @@
 from threading import Thread
 import time
 import pyglet
+from mutagen.mp3 import MP3
 
 class AudioPlayer(Thread):
     def __init__(self, rendererQueue):
@@ -13,25 +14,18 @@ class AudioPlayer(Thread):
             event = self.rendererQueue.get(True)
             audio_file = event["audio_file"]
             volume = event["volume"]
+            pitch = event["pitch"]
             message_timestamp = event["timestamp"]
             now_timestamp = time.time()
 
-            # print "Audio player an audio file ({}) to play from source {}.".format(audio_file, event["source"])
-
-            #if self.player.playing:
-                #print "sound currently playing"
-                # return
-
+            mp3 = MP3(audio_file)
             media = pyglet.media.load(audio_file)
-            self.player.volume = volume
 
-            # this isn't well tested
+            self.player.volume = volume
+            self.player.pitch = pitch
+
             self.player.next()
 
             self.player.queue(media)
             self.player.play()
-
-            # maybe this should be 'next'
-            self.player.eos_action = 'stop'
-
-            # print "{} {} {}".format(self.player.pitch, self.player.playing, self.player.volume)
+            time.sleep(mp3.info.length)
