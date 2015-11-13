@@ -11,7 +11,7 @@ class AudioRenderer(Thread):
     def __init__(self, commentatorQueue, rendererQueue):
         Thread.__init__(self)
         self.commentatorQueue = commentatorQueue
-        self.rendererQueue = rendererQueue  
+        self.rendererQueue = rendererQueue
         self.v = pyvona.create_voice(
                 "GDNAJCIHKDP2YAKG664A",
                 "8yaFb9+jGeuI8DDrYKdK+9jUVNAqqYRuxyG254la"
@@ -19,9 +19,9 @@ class AudioRenderer(Thread):
         self.v.codec = "mp3"
         self.v.region = "us-west"
 
-    def getFilename(self, directory, speech, rate, voice_name):
+    def getFilename(self, directory, speech, rate, voice_name, volume, pitch):
         speech = speech.replace(" ", "").replace("\'", "").replace(":", "")
-        return directory + speech + rate + voice_name + ".mp3"
+        return "{}{}{}{}{}{}.mp3".format(directory, speech, rate, voice_name, volume, pitch)
 
     def run(self):
         while True:
@@ -36,10 +36,10 @@ class AudioRenderer(Thread):
             volume = event.volume
             pitch = event.pitch
 
-            print speech;
-            continue;
+            #print speech;
+            #continue;
 
-            output_file = self.getFilename(AUDIO_DIRECTORY, speech, rate, voice_name)
+            output_file = self.getFilename(AUDIO_DIRECTORY, speech, rate, voice_name, volume, pitch)
             if not os.path.isfile(output_file):
                 self.v.speech_rate = rate
                 self.v.voice_name = voice_name
