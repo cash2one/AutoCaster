@@ -16,7 +16,7 @@ class EventParser(Thread):
         self.eventQueue = eventQueue;
 
         self.eventPattern = re.compile("^\(([_\w]+)\)(.*)$");
-        self.propertySourcePattern = re.compile("(\w+)_(\d+)");
+        self.propertySourcePattern = re.compile("(\w+)_?(\d+)");
         self.initPattern = re.compile("([^,:]+),([^,:]+),img...__(........),img");
         self.killPattern = re.compile("1,img...__(........),([-\d]+),([-\d]+),img...__(........),([-\d]+),([-\d]+),img...__(........),([-\d]+)(,.*)?$");
         self.killAssistsPattern = re.compile("img...__([A-Fa-f0-9]{8})")
@@ -83,7 +83,7 @@ class EventParser(Thread):
                             propertyName = propertyGroups[0];
                             propertySource = int(propertyGroups[1]);
 
-                        #self.eventQueue.put(Messages.PropertyChangeMessage(propertyName, propertySource, propertyValue));
+                        self.eventQueue.put(Messages.PropertyChangeMessage(propertyName, propertySource, propertyValue));
                 elif (eventSource == "Init"):
                     self.eventQueue.put(self.parseInit(data));
                 elif (eventSource == "AddMessage"):

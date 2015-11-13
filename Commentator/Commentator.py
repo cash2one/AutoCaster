@@ -93,7 +93,6 @@ class Commentator(Thread):
 
                     message = "{c} has scored a kill.".format(c = player.champion)
 
-
                     self.processMessage(bot, message)
 
             elif (isinstance(event, Messages.KillMessage)):
@@ -140,4 +139,3 @@ class Commentator(Thread):
     def processMessage(self, actor, message, rate="medium", volume=0.8, pitch=1.0):
         if random.randint(0, 10) < 3:
             self.commentatorQueue.put(actor.generateMessage(message, rate, volume, pitch))
-
