@@ -21,12 +21,14 @@ class Actor(object):
 
     def generateMessage(self, messageType, messageArgs, rate, volume, pitch):
         if self.voice == "Brian":
-            message = self.selectMessageTemplate(messageType, messageArgs)
+            message = self.selectMessageTemplateBrianStyle(messageType, messageArgs)
         else:
             message = self.selectMessageTemplateSalliStyle(messageType, messageArgs)
 
         if not message:
             return;
+
+        message = message.format(**messageArgs);
 
         result = ""
 
