@@ -46,7 +46,9 @@ class EventParser(Thread):
 
             while True:
                 line = self.read_line(client)
+                print line
                 self.processLine(line)
+                print ps.returncode
 
                 if not (ps.returncode == None):
                     break
