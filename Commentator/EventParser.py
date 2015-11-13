@@ -4,7 +4,7 @@ import time
 import re
 import socket
 import requests
-from subprocess import check_call;
+import subprocess
 
 ip = "127.0.0.1";
 port = 8444;
