@@ -2,6 +2,11 @@ from threading import Thread;
 import Messages;
 import time;
 import re;
+import socket;
+
+ip = "192.168.203.180";
+port = 8444;
+
 
 class EventParser(Thread):
 	def __init__(self, eventQueue):
@@ -14,9 +19,18 @@ class EventParser(Thread):
 	def run(self):
 		print "Generating event";
 
-		f = open('game.txt', 'r');
-		ln = 0
-		for line in f:
+		try:
+			s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		except socket.error as err:
+			print "Socket creation failed."
+
+		s.bind((ip, port));
+		s.listen(2)
+		ln=0
+		(client, address) = s.accept()
+		while True:
+			line = read_line(client)
+			print(line)
 			match = self.eventPattern.match(line);
 
 			ln = ln + 1
@@ -49,3 +63,14 @@ class EventParser(Thread):
 						pass
 
 		
+def read_line(s):
+	ret = ''
+
+	while True:
+		c = s.recv(1)
+
+		if c == '\n' or c == '':
+		    break
+		else:
+		    ret += c
+	return ret
