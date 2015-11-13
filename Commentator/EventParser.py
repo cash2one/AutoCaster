@@ -3,95 +3,112 @@ import Messages;
 import time;
 import re;
 import socket;
+import requests;
+from subprocess import check_call
 
 ip = "192.168.203.180";
 port = 8444;
 
 
 class EventParser(Thread):
-	def __init__(self, eventQueue):
-		Thread.__init__(self);
-		self.eventQueue = eventQueue;
+        def __init__(self, eventQueue):
+                Thread.__init__(self);
+                self.eventQueue = eventQueue;
 
-		self.eventPattern = re.compile("^\((\w+)\)(.*)$");
-		self.propertySourcePattern = re.compile("(\w+)_(\d+)");
-		self.initPattern = re.compile("([^,:]+),([^,:]+),img");
+                self.eventPattern = re.compile("^\((\w+)\)(.*)$");
+                self.propertySourcePattern = re.compile("(\w+)_(\d+)");
+                self.initPattern = re.compile("([^,:]+),([^,:]+),img");
 
-	def run(self):
-		print "Generating event";
+        def run(self):
+                print "Generating event";
+                try:
+                        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                except socket.error as err:
+                        print "Socket creation failed."
+                (gameID, encryptionKey) = self.requestFeaturedGameMode()
+                s.bind((ip, port));
+                s.listen(2)
+                ln=0
+                (client, address) = s.accept()
+                self.startLeague(gameID, encryptionKey)
+                while True:
+                        line = self.read_line(client)
+                        print(line)
+                        match = self.eventPattern.match(line);
 
-		try:
-			s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		except socket.error as err:
-			print "Socket creation failed."
+                        ln = ln + 1
+                        if (match):
+                                groups = match.groups();
 
-		s.bind((ip, port));
-		s.listen(2)
-		ln=0
-		(client, address) = s.accept()
-		while True:
-			line = read_line(client)
-			print(line)
-			match = self.eventPattern.match(line);
+                                if (groups):
+                                        eventSource = groups[0];
+                                        data = groups[1];
 
-			ln = ln + 1
-			if (match):
-				groups = match.groups();
+                                        if (eventSource == "Update"):
+                                                propertyAndValues = data.split(",");
 
-				if (groups):
-					eventSource = groups[0];
-					data = groups[1];
+                                                i = 0;
+                                                while i < len(propertyAndValues):
+                                                        propertyName = propertyAndValues[i];
+                                                        propertyValue = propertyAndValues[i + 1];
+                                                        propertySource = -1;
+                                                        i = i + 2
 
-					if (eventSource == "Update"):
-						propertyAndValues = data.split(",");
+                                                        propertyMatch = self.propertySourcePattern.match(propertyName);
 
-						i = 0;
-						while i < len(propertyAndValues):
-							propertyName = propertyAndValues[i];
-							propertyValue = propertyAndValues[i + 1];
-							propertySource = -1;
-							i = i + 2
+                                                        if (propertyMatch):
+                                                                propertyGroups = propertyMatch.groups();
+                                                                propertyName = propertyGroups[0];
+                                                                propertySource = int(propertyGroups[1]);
 
-							propertyMatch = self.propertySourcePattern.match(propertyName);
-
-							if (propertyMatch):
-								propertyGroups = propertyMatch.groups();
-								propertyName = propertyGroups[0];
-								propertySource = int(propertyGroups[1]);
-
-							self.eventQueue.put(Messages.PropertyChangeMessage(propertyName, propertySource, propertyValue));
-					elif (eventSource == "Init"):
-						self.eventQueue.put(self.parseInit(data));
-						pass
+                                                        self.eventQueue.put(Messages.PropertyChangeMessage(propertyName, propertySource, propertyValue));
+                                        elif (eventSource == "Init"):
+                                                self.eventQueue.put(self.parseInit(data));
+                                                pass
 
 
-		
-def read_line(s):
-	ret = ''
+                
+        def read_line(self, s):
+                ret = ''
 
-	while True:
-		c = s.recv(1)
+                while True:
+                        c = s.recv(1)
 
-		if c == '\n' or c == '':
-		    break
-		else:
-		    ret += c
-	return ret
+                        if c == '\n' or c == '':
+                                break
+                        else:
+                                ret += c
+                return ret
 
-	def parseInit(self, rawData):
-		groups = self.initPattern.findall(rawData);
+        def parseInit(self, rawData):
+                groups = self.initPattern.findall(rawData);
 
-		if (groups):
-			summonerNames = [];
-			championNames = [];
+                if (groups):
+                        summonerNames = [];
+                        championNames = [];
 
-			i = 0;
-			while i < len(groups):
-				summonerName = groups[i][0];
-				championName = groups[i][1];
-				i = i + 1
+                        i = 0;
+                        while i < len(groups):
+                                summonerName = groups[i][0];
+                                championName = groups[i][1];
+                                i = i + 1
 
-				summonerNames.append(summonerName);
-				championNames.append(championName);
+                                summonerNames.append(summonerName);
+                                championNames.append(championName);
 
-			return Messages.InitMessage(summonerNames, championNames);
+                        return Messages.InitMessage(summonerNames, championNames);
+
+        def requestFeaturedGameMode(self):
+                r = requests.get('https://na.api.pvp.net/observer-mode/rest/featured?api_key=3c8bb0c2-ac29-4441-8211-35f44a2cd943');
+                if (r.status_code == 200):
+                    json = r.json()
+                    gameID = json['gameList'][0]['gameId']
+                    encryptionKey = json['gameList'][0]['observers']['encryptionKey']
+                    return (gameID, encryptionKey)
+        def startLeague(self, gameID, encryptionKey):
+                check_call([
+                    r"C:\Riot Games\League of Legends\RADS\solutions\lol_game_client_sln\releases\0.0.1.110\deploy\League of Legends.exe",
+                    "8394",
+                    "LoLLauncher.exe",
+                    "",
+                    "spectate spectator.na.lol.riotgames.com:80" + gameID +" "+encryptionKey + " NA1"])
