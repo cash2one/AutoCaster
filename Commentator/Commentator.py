@@ -146,6 +146,7 @@ class Commentator(Thread):
 
 					if (team.update(event)):
 						if (event.propertyName == "DragonBuffs"):
+							print ">>>>>>> DRAGON";
 							messageType = CommentaryType.DragonKill;
 						elif (event.propertyName == "TowerKills"):
 							messageType = CommentaryType.BuildingKill;
