@@ -1,33 +1,33 @@
-from EventParser import EventParser;
-from Commentator import Commentator;
-from AudioRenderer import AudioRenderer;
-from AudioPlayer import AudioPlayer;
-from threading import Thread;
-from Queue import Queue;
-import time;
+from EventParser import EventParser
+from Commentator import Commentator
+from AudioRenderer import AudioRenderer
+from AudioPlayer import AudioPlayer
+from threading import Thread
+from Queue import Queue
+import time
 
-eventQueue = Queue();
-commentatorQueue = Queue();
-rendererQueue = Queue();
+eventQueue = Queue()
+commentatorQueue = Queue()
+rendererQueue = Queue()
 
-eventParser = EventParser(eventQueue);
+eventParser = EventParser(eventQueue)
 commentator = Commentator(eventQueue, commentatorQueue)
-audioRenderer = AudioRenderer(commentatorQueue, rendererQueue);
-audioPlayer = AudioPlayer(rendererQueue);
+audioRenderer = AudioRenderer(commentatorQueue, rendererQueue)
+audioPlayer = AudioPlayer(rendererQueue)
 
-eventParser.daemon = True;
-eventParser.start();
+eventParser.daemon = True
+eventParser.start()
 
-commentator.daemon = True;
-commentator.start();
+commentator.daemon = True
+commentator.start()
 
-audioRenderer.daemon = True;
-audioRenderer.start();
+audioRenderer.daemon = True
+audioRenderer.start()
 
-audioPlayer.daemon = True;
-audioPlayer.start();
+audioPlayer.daemon = True
+audioPlayer.start()
 
 while True:
-	time.sleep(100);
+	time.sleep(100)
 
 print "Finished"

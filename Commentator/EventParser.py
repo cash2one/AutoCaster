@@ -18,18 +18,25 @@ class EventParser(Thread):
         self.eventPattern = re.compile("^\((\w+)\)(.*)$");
         self.propertySourcePattern = re.compile("(\w+)_(\d+)");
         self.initPattern = re.compile("([^,:]+),([^,:]+),img...__(........),img");
-        self.killPattern = re.compile("1,img...__(........),([-\d]+),([-\d]+),img...__(........),([-\d]+),([-\d]+),img...__(........),([-\d]+)(?:,img...__(........))*")
+        self.killPattern = re.compile("1,img...__(........),([-\d]+),([-\d]+),img...__(........),([-\d]+),([-\d]+),img...__(........),([-\d]+)(,.*)?$");
+        self.killAssistsPattern = re.compile("img...__([A-Fa-f0-9]{8})");
 
     def run(self):
         print "Generating event";
+        self.runFromFile();
+        self.runFromGame();
+
+    def runFromGame(self):
         try:
-                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         except socket.error as err:
-                print "Socket creation failed."
+            print "Socket creation failed."
+            return;
+
         (gameID, encryptionKey) = self.requestFeaturedGameMode()
         s.bind((ip, port));
         s.listen(2)
-        ln=0
+
         self.startLeague(gameID, encryptionKey)
         (client, address) = s.accept()
         while True:
@@ -37,36 +44,43 @@ class EventParser(Thread):
             print(line)
             match = self.eventPattern.match(line);
 
-            ln = ln + 1
-            if (match):
-                groups = match.groups();
+    def runFromFile(self):
+        f = open('game.txt', 'r');
+        for line in f:
+            self.processLine(line);
 
-                if (groups):
-                    eventSource = groups[0];
-                    data = groups[1];
+    def processLine(self, line):
+        match = self.eventPattern.match(line);
 
-                    if (eventSource == "Update"):
-                        propertyAndValues = data.split(",");
+        if (match):
+            groups = match.groups();
 
-                        i = 0;
-                        while i < len(propertyAndValues):
-                            propertyName = propertyAndValues[i];
-                            propertyValue = propertyAndValues[i + 1];
-                            propertySource = -1;
-                            i = i + 2
+            if (groups):
+                eventSource = groups[0];
+                data = groups[1];
 
-                            propertyMatch = self.propertySourcePattern.match(propertyName);
+                if (eventSource == "Update"):
+                    propertyAndValues = data.split(",");
 
-                            if (propertyMatch):
-                                propertyGroups = propertyMatch.groups();
-                                propertyName = propertyGroups[0];
-                                propertySource = int(propertyGroups[1]);
+                    i = 0;
+                    while i < len(propertyAndValues):
+                        propertyName = propertyAndValues[i];
+                        propertyValue = propertyAndValues[i + 1];
+                        propertySource = -1;
+                        i = i + 2
 
-                            self.eventQueue.put(Messages.PropertyChangeMessage(propertyName, propertySource, propertyValue));
-                    elif (eventSource == "Init"):
-                        self.eventQueue.put(self.parseInit(data));
-                    elif (eventSource == "AddMessage"):
-                        self.eventQueue.put(self.parseKillMessage(data));
+                        propertyMatch = self.propertySourcePattern.match(propertyName);
+
+                        if (propertyMatch):
+                            propertyGroups = propertyMatch.groups();
+                            propertyName = propertyGroups[0];
+                            propertySource = int(propertyGroups[1]);
+
+                        #self.eventQueue.put(Messages.PropertyChangeMessage(propertyName, propertySource, propertyValue));
+                elif (eventSource == "Init"):
+                    self.eventQueue.put(self.parseInit(data));
+                elif (eventSource == "AddMessage"):
+                    self.eventQueue.put(self.parseKillMessage(data));
 
 
     def parseInit(self, rawData):
@@ -95,13 +109,17 @@ class EventParser(Thread):
 
         if (match):
             groups = match.groups();
-            print groups;
 
-        victimId = 0;
-        killerId = 0;
-        assistIds = 0;
+            victimId = groups[0];
+            killerId = groups[3];
 
-        return Messages.KillMessage(victimId, killerId, assistIds);
+            assists = groups[8];
+            assistIds = None;
+
+            if (assists):
+                assistIds = self.killAssistsPattern.findall(assists);
+
+            return Messages.KillMessage(victimId, killerId, assistIds);
 
     def read_line(self, s):
         ret = ''
@@ -123,12 +141,11 @@ class EventParser(Thread):
             gameID = str(json['gameList'][0]['gameId'])
             encryptionKey = json['gameList'][0]['observers']['encryptionKey']
             return (gameID, encryptionKey)
-        else:
-            return False
+        return False
 
     def startLeague(self, gameID, encryptionKey):
         cwd = "C:\\Riot Games\\League of Legends\\RADS\\solutions\\lol_game_client_sln\\releases\\0.0.1.111\\deploy\\"
-        # print cwd
+        print cwd
         p = subprocess.Popen([
                 cwd + "League of Legends.exe",
                 "8394",
