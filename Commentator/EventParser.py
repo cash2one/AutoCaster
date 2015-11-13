@@ -1,12 +1,12 @@
-from threading import Thread;
-import Messages;
-import time;
-import re;
-import socket;
-import requests;
-from subprocess import check_call
+from threading import Thread
+import Messages
+import time
+import re
+import socket
+import requests
+import subprocess
 
-ip = "192.168.203.180";
+ip = "";
 port = 8445;
 
 
@@ -30,10 +30,10 @@ class EventParser(Thread):
         s.bind((ip, port));
         s.listen(2)
         ln=0
-        (client, address) = s.accept()
         self.startLeague(gameID, encryptionKey)
+        (client, address) = s.accept()
         while True:
-            line = read_line(client)
+            line = self.read_line(client)
             print(line)
             match = self.eventPattern.match(line);
 
@@ -103,7 +103,7 @@ class EventParser(Thread):
 
         return Messages.KillMessage(victimId, killerId, assistIds);
 
-    def read_line(s):
+    def read_line(self, s):
         ret = ''
 
         while True:
@@ -114,17 +114,25 @@ class EventParser(Thread):
             else:
                 ret += c
         return ret
+
     def requestFeaturedGameMode(self):
         r = requests.get('https://na.api.pvp.net/observer-mode/rest/featured?api_key=3c8bb0c2-ac29-4441-8211-35f44a2cd943');
+        # print r.status_code
         if (r.status_code == 200):
             json = r.json()
-            gameID = json['gameList'][0]['gameId']
+            gameID = str(json['gameList'][0]['gameId'])
             encryptionKey = json['gameList'][0]['observers']['encryptionKey']
             return (gameID, encryptionKey)
+        else:
+            return False
+
     def startLeague(self, gameID, encryptionKey):
-            check_call([
-                r"C:\Riot Games\League of Legends\RADS\solutions\lol_game_client_sln\releases\0.0.1.110\deploy\League of Legends.exe",
+        cwd = "C:\\Riot Games\\League of Legends\\RADS\\solutions\\lol_game_client_sln\\releases\\0.0.1.111\\deploy\\"
+        # print cwd
+        p = subprocess.Popen([
+                cwd + "League of Legends.exe",
                 "8394",
                 "LoLLauncher.exe",
                 "",
-                "spectate spectator.na.lol.riotgames.com:80" + gameID +" "+encryptionKey + " NA1"])
+                "spectate spectator.na.lol.riotgames.com:80 {} {} NA1".format(encryptionKey, gameID)],
+                cwd=cwd)
