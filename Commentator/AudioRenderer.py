@@ -35,7 +35,7 @@ class AudioRenderer(Thread):
             rate = "medium"
             voice_name = "Brian"
 
-            filename = self.getFilename(AUDIO_DIRECTORY, speech, rate, voice_name)
+            output_file = self.getFilename(AUDIO_DIRECTORY, speech, rate, voice_name)
             if not os.path.isfile(output_file):
                 self.v.speech_rate = rate
                 self.v.voice_name = voice_name
