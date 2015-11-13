@@ -16,7 +16,7 @@ class Commentator(Thread):
 
 		self.commentators = []
 		self.commentators.append(Actor("Rivington the 4th", "Brian", 0))
-		self.commentators.append(Actor("Your mom", "Salli", 1))
+		self.commentators.append(Actor(random.choice(["Robo shocks", "the queen of twitch", "Your mom", "Pissed off", "undefined"]), "Salli", 1))
 
 		riv_bot = self.commentators[0]
 		salli_bot = self.commentators[1]
