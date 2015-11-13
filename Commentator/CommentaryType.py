@@ -6,3 +6,5 @@ class CommentaryType:
 	BuildingKill = 3
 	DragonKill = 4
 	BaronKill = 5
+	LevelUp = 6
+	GameState = 7

@@ -29,6 +29,8 @@ class Commentator(Thread):
 		self.numberTh = ["first", "second", "third", "forth", "fifth", "sixth", "seventh", "eigth", "ninth", "tenth", "eleventh" ];
 
 	def reset(self):
+		self.lastMessageTime = 0;
+
 		self.gameProperties = ["GameTime"];
 		self.game = Game.Game();
 
@@ -86,7 +88,12 @@ class Commentator(Thread):
 			elif (isinstance(event, Messages.PropertyChangeMessage)):
 				if (event.propertyName in self.gameProperties):
 					if (self.game.update(event)):
-						pass
+						if (event.propertyName == "GameTime"):
+							if (self.lastMessageTime > 0) and (self.game.time > self.lastMessageTime):
+								messageType = CommentaryType.GameState;
+								messageArgs["teams"] = self.teams;
+								messageArgs["players"] = self.players;
+
 				if (event.propertyName in self.playerProperties):
 					player = self.players[event.sourceId];
 
@@ -105,12 +112,16 @@ class Commentator(Thread):
 								teamGoldCurrent = teamGoldCurrent + self.players[i].goldCurrent;
 
 							self.eventQueue.put(Messages.PropertyChangeMessage("TeamGoldCurrent", 0 if event.sourceId < 5 else 1, teamGoldCurrent))
+						elif (event.propertyName == "Level"):
+							messageType = CommentaryType.LevelUp;
+							messageArgs["player"] = player;
+							messageArgs["playerTeam"] = self.teams[0] if player.id < 5 else self.teams[1];
+							messageArgs["enemyTeam"] = self.teams[1] if player.id < 5 else self.teams[0];
+							pass
 				elif (event.propertyName in self.teamProperties):
 					team = self.teams[event.sourceId];
 
 					if (team.update(event)):
-	
-
 						if (event.propertyName == "DragonBuffs"):
 							messageType = CommentaryType.DragonKill;
 						elif (event.propertyName == "TowerKills"):
@@ -150,5 +161,9 @@ class Commentator(Thread):
 				return player;
 
 	def processMessage(self, actor, messageType, messageArgs, rate="medium", volume=0.8, pitch=1.0):
-		self.commentatorQueue.put(actor.generateMessage(messageType, messageArgs, rate, volume, pitch))
+		message = actor.generateMessage(messageType, messageArgs, rate, volume, pitch);
+
+		if (message):
+			self.commentatorQueue.put(message)
+			self.lastMessageTime = self.game.time;
 

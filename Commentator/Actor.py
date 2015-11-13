@@ -5,7 +5,7 @@ from Messages import CommentaryMessage
 PRONUNCIATION_DIR = "./pronounce/"
 
 class Actor(object):
-    def __init__(self, name, voice, sourceId, pronounce_file="default.json"):
+    def __init__(self, name, voice, sourceId, pronounce_file="default_pronounce.json"):
         self.name = name;
         self.voice = voice;
         
@@ -20,7 +20,12 @@ class Actor(object):
         self.teamFavor = 0;
 
     def generateMessage(self, messageType, messageArgs, rate, volume, pitch):
-        message = self.selectMessageTemplate(messageType, messageArgs).format(**messageArgs);
+        message = self.selectMessageTemplate(messageType, messageArgs)
+
+        if not message:
+            return;
+
+        message = message.format(**messageArgs);
         result = ""
         
         for i in message.split(" "):
@@ -56,6 +61,8 @@ class Actor(object):
                 return "{team.name} team has just slain their {nth} dragon of the game.";
             else:
                 return "The {team.name} team has slain their {nth} dragon.";
-
-
+        elif (messageType == CommentaryType.LevelUp):
+            playerLevel = messageArgs["player"].level;
+            if (playerLevel == 6 or playerLevel == 11 or playerLevel == 16):
+                return "{player.champion} just reached level {player.level}. The {enemyTeam.name} better watch out for that.";
 
