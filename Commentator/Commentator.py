@@ -16,7 +16,7 @@ class Commentator(Thread):
 
 		self.commentators = []
 		self.commentators.append(Actor("Rivington the 4th", "Brian", 0))
-		self.commentators.append(Actor("Salli", "Salli", 1))
+		self.commentators.append(Actor("Your mom", "Salli", 1))
 
 		riv_bot = self.commentators[0]
 		salli_bot = self.commentators[1]
@@ -25,7 +25,7 @@ class Commentator(Thread):
 
 		with open("Config.json") as configFile:
 			config = json.load(configFile)
-	
+
 		self.numberTh = ["first", "second", "third", "forth", "fifth", "sixth", "seventh", "eigth", "ninth", "tenth", "eleventh" ];
 
 	def reset(self):
