@@ -19,40 +19,41 @@ class EventParser(Thread):
         self.propertySourcePattern = re.compile("(\w+)_(\d+)");
         self.initPattern = re.compile("([^,:]+),([^,:]+),img...__(........),img");
         self.killPattern = re.compile("1,img...__(........),([-\d]+),([-\d]+),img...__(........),([-\d]+),([-\d]+),img...__(........),([-\d]+)(,.*)?$");
-        self.killAssistsPattern = re.compile("img...__([A-Fa-f0-9]{8})");
+        self.killAssistsPattern = re.compile("img...__([A-Fa-f0-9]{8})")
 
-        self.buffer = "";
+        self.buffer = ""
 
     def run(self):
-        print "Generating event";
-        #self.runFromFile();
-        while True:
-            self.runFromGame();
+        print "Generating event"
+        #self.runFromFile()
+        self.runFromGame()
 
     def runFromGame(self):
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         except socket.error as err:
             print "Socket creation failed."
-            return;
+            return
 
-        (gameID, encryptionKey) = self.requestFeaturedGameMode()
-        s.bind((ip, port));
+        s.bind((ip, port))
         s.listen(2)
 
-        ps = self.startLeague(gameID, encryptionKey)
-        (client, address) = s.accept()
-        #client.setblocking(False)
         while True:
-            line = self.read_line(client)
-            self.processLine(line);
-            if (ps.returncode != null):
-                return false
+            (gameID, encryptionKey) = self.requestFeaturedGameMode()
+            ps = self.startLeague(gameID, encryptionKey)
+            (client, address) = s.accept()
+
+            while True:
+                line = self.read_line(client)
+                self.processLine(line)
+
+                if not ps.returncode:
+                    break
 
     def runFromFile(self):
-        f = open('game.txt', 'r');
+        f = open('game.txt', 'r')
         for line in f:
-            self.processLine(line);
+            self.processLine(line)
 
     def processLine(self, line):
         match = self.eventPattern.match(line);
