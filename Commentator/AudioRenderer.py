@@ -20,7 +20,7 @@ class AudioRenderer(Thread):
         self.v.region = "us-west"
 
     def getFilename(self, directory, speech, rate, voice_name):
-        speech = speech.replace(" ", "").replace("\'","")
+        speech = speech.replace(" ", "").replace("\'", "").replace(":", "")
         return directory + speech + rate + voice_name + ".mp3"
 
     def run(self):
