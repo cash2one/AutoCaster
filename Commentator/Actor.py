@@ -5,13 +5,13 @@ from Messages import CommentaryMessage
 PRONUNCIATION_DIR = "./pronounce/"
 
 class Actor(object):
-    def __init__(self, name, voice, sourceId, pronounce_file="default.json"):
+    def __init__(self, name, voice, sourceId, pronounce_file="default_pronounce.json"):
         self.name = name;
         self.voice = voice;
-        
+
         with open(PRONUNCIATION_DIR + pronounce_file, 'rb') as fp:
             self.pronounce = json.load(fp);
-        
+
         self.sourceId = sourceId;
         self.lastTalkTime = 0;
         self.excitement = 0;
@@ -22,7 +22,7 @@ class Actor(object):
     def generateMessage(self, messageType, messageArgs, rate, volume, pitch):
         message = self.selectMessageTemplate(messageType, messageArgs).format(**messageArgs);
         result = ""
-        
+
         for i in message.split(" "):
             lookup = i.lower().replace('.', '').replace(',', '')
             if lookup in self.pronounce:
@@ -31,7 +31,7 @@ class Actor(object):
             else:
                 result += i
             result += " "
-        
+
         return CommentaryMessage(self.voice, result, self.sourceId, rate, volume, pitch)
 
     def selectMessageTemplate(self, messageType, messageArgs):
