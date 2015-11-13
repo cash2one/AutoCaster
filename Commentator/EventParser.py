@@ -25,8 +25,8 @@ class EventParser(Thread):
 
     def run(self):
         print "Generating event"
-        # self.runFromFile()
-        self.runFromGame()
+        self.runFromFile()
+        #self.runFromGame()
 
     def runFromGame(self):
         try:
