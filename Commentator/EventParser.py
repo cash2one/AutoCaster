@@ -16,29 +16,29 @@ class EventParser(Thread):
 		self.eventPattern = re.compile("^\((\w+)\)(.*)$");
 		self.propertySourcePattern = re.compile("(\w+)_(\d+)");
 		self.initPattern = re.compile("([^,:]+),([^,:]+),img...__(........),img");
-		self.killPattern = re.compile("1,img...__(........),([-\d]+),([-\d]+),img...__(........),([-\d]+),([-\d]+),img...__(........),([-\d]+)(?:,img...__(........))*")
+		self.killPattern = re.compile("1,img...__(........),([-\d]+),([-\d]+),img...__(........),([-\d]+),([-\d]+),img...__(........),([-\d]+)(,.*)?$");
+		self.killAssistsPattern = re.compile("img...__([A-Fa-f0-9]{8})");
 
 	def run(self):
 		print "Generating event";
 
-		#f = open('game.txt', 'r');
-		#ln = 0
-		#for line in f:
-		try:
-			s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		except socket.error as err:
-			print "Socket creation failed."
+		#try:
+		#	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		#except socket.error as err:
+		#	print "Socket creation failed."
 
-		s.bind((ip, port));
-		s.listen(2)
-		ln=0
-		(client, address) = s.accept()
-		while True:
-			line = read_line(client)
-			print(line)
+		#s.bind((ip, port));
+		#s.listen(2)
+		#ln=0
+		#(client, address) = s.accept()
+		#while True:
+		#	line = read_line(client)
+		#	print(line)
+
+		f = open('game.txt', 'r');
+		for line in f:
 			match = self.eventPattern.match(line);
 
-			ln = ln + 1
 			if (match):
 				groups = match.groups();
 
@@ -63,7 +63,7 @@ class EventParser(Thread):
 								propertyName = propertyGroups[0];
 								propertySource = int(propertyGroups[1]);
 
-							self.eventQueue.put(Messages.PropertyChangeMessage(propertyName, propertySource, propertyValue));
+							#self.eventQueue.put(Messages.PropertyChangeMessage(propertyName, propertySource, propertyValue));
 					elif (eventSource == "Init"):
 						self.eventQueue.put(self.parseInit(data));
 					elif (eventSource == "AddMessage"):
@@ -96,13 +96,17 @@ class EventParser(Thread):
 
 		if (match):
 			groups = match.groups();
-			print groups;
 
-		victimId = 0;
-		killerId = 0;
-		assistIds = 0;
+			victimId = groups[0];
+			killerId = groups[3];
 
-		return Messages.KillMessage(victimId, killerId, assistIds);
+			assists = groups[8];
+			assistIds = None;
+
+			if (assists):
+				assistIds = self.killAssistsPattern.findall(assists);
+
+			return Messages.KillMessage(victimId, killerId, assistIds);
 
 def read_line(s):
 	ret = ''
