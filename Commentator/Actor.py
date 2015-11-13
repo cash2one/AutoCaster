@@ -5,7 +5,7 @@ from Messages import CommentaryMessage
 PRONUNCIATION_DIR = "./pronounce/"
 
 class Actor(object):
-    def __init__(self, name, voice, sourceId, pronounce_file="default.json"):
+    def __init__(self, name, voice, sourceId, pronounce_file="default_pronounce.json"):
         self.name = name;
         self.voice = voice;
 
