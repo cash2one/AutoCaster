@@ -42,8 +42,11 @@ bool injected = false;
 std::queue<string>* message_queue = new std::queue<string>;
  
 //Constants to ease opcode writing.
-const byte mov_eax[] = { 0xb8 };
-const byte jmp_eax[] = { 0xff, 0xe0 };
+const byte MOV_EAX[] = { 0xb8 };
+const byte JMP_EAX[] = { 0xff, 0xe0 };
+
+//Offet for the Invoke method
+const long INVOKE_OFFSET = 0x9627C0;
  
 //======================================================================
  
@@ -64,14 +67,14 @@ void ApplyOutputDebugStringAPatch(){
  
         //Concat all bytes into a final vector.
         std::vector<byte> combined;
-        for (int i = 0; i < sizeof(mov_eax); i++){
-                combined.push_back(mov_eax[i]);
+        for (int i = 0; i < sizeof(MOV_EAX); i++){
+                combined.push_back(MOV_EAX[i]);
         }
         for (int i = 0; i < sizeof(tmp_union.arr); i++){
                 combined.push_back(tmp_union.arr[i]);
         }
-        for (int i = 0; i < sizeof(jmp_eax); i++){
-                combined.push_back(jmp_eax[i]);
+        for (int i = 0; i < sizeof(JMP_EAX); i++){
+                combined.push_back(JMP_EAX[i]);
         }
  
         //Apply patch
@@ -95,14 +98,14 @@ void ApplyInvokePatch(){
  
         //Concat all bytes into a final vector.
         std::vector<byte> combined;
-        for (int i = 0; i < sizeof(mov_eax); i++){
-                combined.push_back(mov_eax[i]);
+        for (int i = 0; i < sizeof(MOV_EAX); i++){
+                combined.push_back(MOV_EAX[i]);
         }
         for (int i = 0; i < sizeof(tmp_union.arr); i++){
                 combined.push_back(tmp_union.arr[i]);
         }
-        for (int i = 0; i < sizeof(jmp_eax); i++){
-                combined.push_back(jmp_eax[i]);
+        for (int i = 0; i < sizeof(JMP_EAX); i++){
+                combined.push_back(JMP_EAX[i]);
         }
  
         //Apply patch
@@ -240,8 +243,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
  
                 //Hook scaleform movie::invoke()
                 HMODULE hBaseAddress = GetModuleHandle(L"League of Legends.exe");
-                long invoke_offset = 0x9627C0; //magic
-                InvokeAddress = (FARPROC)((uintptr_t)hBaseAddress + invoke_offset);
+                InvokeAddress = (FARPROC)((uintptr_t)hBaseAddress + INVOKE_OFFSET);
                 ApplyInvokePatch();
  
                 //Separate thread will send invoke messages to network socket, to not block hooked render loop.
